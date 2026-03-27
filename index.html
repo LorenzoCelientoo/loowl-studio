@@ -429,6 +429,135 @@
       letter-spacing: 0.4em;
     }
 
+    /* ── HAMBURGER ── */
+    #hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    #hamburger span {
+      display: block;
+      width: 26px;
+      height: 2px;
+      background: var(--gold);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    #hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    #hamburger.open span:nth-child(2) { opacity: 0; }
+    #hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+
+      /* Navbar */
+      #hamburger { display: flex; }
+
+      #nav-links {
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(10, 22, 40, 0.97);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-top: 1px solid rgba(201, 168, 76, 0.15);
+        padding: 1rem 0;
+      }
+
+      #nav-links.open { display: flex; }
+
+      #nav-links li { width: 100%; }
+
+      #nav-links a {
+        border: none;
+        border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+        padding: 1rem 2rem;
+        font-size: 0.85rem;
+        letter-spacing: 0.3em;
+      }
+
+      /* Hero */
+      #hero-content h1 {
+        font-size: clamp(2.2rem, 12vw, 4rem);
+      }
+
+      #hero-content .tagline {
+        font-size: clamp(0.6rem, 3vw, 0.85rem);
+        letter-spacing: 0.3em;
+      }
+
+      /* Section 2 */
+      #reel {
+        justify-content: center;
+      }
+
+      #reel-text {
+        margin-left: 0;
+        padding: 7rem 2rem 4rem;
+        text-align: center;
+        align-items: center;
+        max-width: 100%;
+      }
+
+      #reel-text p {
+        max-width: 100%;
+      }
+
+      /* Section 3 */
+      #work-content {
+        padding: 6rem 1.5rem 4rem;
+        gap: 2rem;
+      }
+
+      #work-content h2 {
+        font-size: clamp(1.8rem, 7vw, 2.8rem);
+      }
+
+      .work-tags {
+        gap: 0.7rem;
+      }
+
+      .work-tags span {
+        font-size: 0.7rem;
+        padding: 0.5rem 1rem;
+        letter-spacing: 0.15em;
+      }
+
+      /* Section 4 */
+      #contact {
+        padding: 5rem 1.5rem;
+      }
+
+      .contact-inner h2 {
+        font-size: clamp(1.8rem, 8vw, 3rem);
+      }
+
+      .contact-links a {
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        word-break: break-all;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #hero-content h1 {
+        font-size: 2rem;
+      }
+
+      #reel-text h2 {
+        font-size: 1.9rem;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -436,6 +565,9 @@
   <!-- ══ NAVBAR ══ -->
   <nav id="navbar">
     <a id="nav-logo" href="#hero">Lo<span>owl</span> Studio</a>
+    <button id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
     <ul id="nav-links">
       <li><a href="#hero">Home</a></li>
       <li><a href="#reel">About</a></li>
@@ -523,6 +655,21 @@
       navbar.classList.toggle('scrolled', window.scrollY > 60);
     });
 
+    // ── Hamburger menu ──
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      navLinks.classList.toggle('open');
+    });
+    // Close menu when a link is tapped
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        navLinks.classList.remove('open');
+      });
+    });
+
     // ── Scroll animations ──
     const revealEls = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver((entries) => {
@@ -536,17 +683,18 @@
 
     // ── Active nav state ──
     const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('#nav-links a');
+    const navLinkItems = document.querySelectorAll('#nav-links a');
     const activeObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          navLinks.forEach(link => {
+          navLinkItems.forEach(link => {
             link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
           });
         }
       });
     }, { threshold: 0.4 });
     sections.forEach(section => activeObserver.observe(section));
+
   </script>
 
 </body>
