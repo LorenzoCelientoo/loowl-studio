@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RESET & ARCHIVE GLOBAL SETUP
+   RESET & COMBINED GLOBAL SETUP
    ========================================================================== */
 * {
     margin: 0;
@@ -11,164 +11,275 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Root Design Variables: Heritage / Vintage Athletic / Premium Archive */
-:root {
-    --heritage-navy: #112233;   /* Deep premium vintage navy blue */
-    --warm-cream: #fcfaf6;     /* Soft high-end paper white background */
-    --carbon-black: #1a1a1a;   /* Rich editorial print text color */
-    --muted-tan: #e6e0d4;      /* Page divider lines and border frame */
-}
-
 body {
-    background-color: var(--warm-cream);
-    color: var(--carbon-black);
+    background-color: #0b0c0d; /* Carbon dark base */
+    color: #e3e5e8;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    line-height: 1.7;
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
 
 .container {
     width: 100%;
-    max-width: 1140px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
 }
 
-/* Background Image Overlays (Combines Gradient with Blue Tint) */
-.archive-overlay {
+/* Color Tokens - Swapped Dark Orange out for Forest Green */
+:root {
+    --forest-green: #1b4332; 
+    --forest-green-glow: #2d6a4f;
+    --dark-surface: #121416;
+    --border-gray: #232629;
+}
+
+/* Overlays */
+.vignette {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Layer 1: Dark blue transparent tint layer over background image */
-    background-color: rgba(17, 34, 51, 0.25);
-    /* Layer 2: Smooth editorial fade gradient down into body layout */
-    background-image: linear-gradient(180deg, rgba(17,34,51,0.2) 0%, rgba(26,26,26,0.85) 100%);
+    background: linear-gradient(180deg, rgba(11,12,13,0.6) 0%, rgba(11,12,13,0.9) 100%),
+                radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(11,12,13,0.95) 100%);
     z-index: 1;
 }
 
-.navy-overlay {
+.hard-vignette {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Deeper blend overlay for the middle section background image */
-    background: rgba(17, 34, 51, 0.92);
+    background: rgba(8,9,10,0.85);
     z-index: 1;
-}
-
-/* Inline Graphic Tint Treatment for Photo 5 */
-.image-tint-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-}
-
-.image-blue-tint {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(17, 34, 51, 0.25); /* Almost transparent dark blue layer */
-    pointer-events: none; /* Allows cursor hover to bypass tint wrapper */
-    transition: background-color 0.4s ease;
-}
-
-.archive-frame:hover .image-blue-tint {
-    background-color: rgba(17, 34, 51, 0.05); /* Lightens slightly on hover */
 }
 
 /* ==========================================================================
-   TYPOGRAPHY & EDITORIAL TAGS
+   WILL1 TYPOGRAPHY & BUTTONS (Editorial / Elegant)
    ========================================================================== */
-h1, h2, h3, .massive-serif {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-    color: var(--heritage-navy);
+.hero-will1 h1, 
+.hero-will1 .main-logo-letter, 
+.editorial-story h2, 
+.signature {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
 }
 
-h2 {
-    font-size: 3rem;
-    line-height: 1.05;
+.editorial-story h2 {
+    font-size: 2.5rem;
+    line-height: 1.25;
     margin-bottom: 2rem;
 }
 
-.italic-serif {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 500;
-    text-transform: none;
-    font-style: italic;
-    letter-spacing: 0;
+.editorial-story p {
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+    color: #b2b8bd;
 }
 
-/* Beautiful Book Journal Text Style */
-.story-text p {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    color: #333333;
-    font-weight: 500;
-    margin-bottom: 1.6rem;
+.btn-editorial {
+    display: inline-block;
+    padding: 0.95rem 2.25rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.section-label {
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    color: var(--heritage-navy);
-    margin-bottom: 1.2rem;
-}
-
-.section-label.text-cream {
-    color: var(--warm-cream);
-    opacity: 0.8;
+.btn-editorial:hover {
+    background-color: #ffffff;
+    color: #0b0c0d;
 }
 
 /* ==========================================================================
-   ARCHIVE BUTTONS
+   WILL2 TYPOGRAPHY & TAGS (Athletic / High-Impact Focus)
    ========================================================================== */
-.btn-archive {
+.parallax-expect h2,
+.parallax-expect h3,
+.cta-banner-impact h2,
+.massive-heading {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+}
+
+.parallax-expect h2 {
+    font-size: 3.5rem;
+    line-height: 0.95;
+    margin-bottom: 2rem;
+}
+
+.highlight {
+    color: var(--forest-green-glow);
+}
+
+.section-tag {
     display: inline-block;
-    padding: 1rem 2.5rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: var(--forest-green-glow);
+    border-left: 3px solid var(--forest-green-glow);
+    padding-left: 0.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.section-tag.invert {
+    color: #ffffff;
+    border-left-color: var(--forest-green-glow);
+}
+
+.btn-impact {
+    display: inline-block;
+    padding: 1.1rem 2.5rem;
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    font-style: italic;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     text-decoration: none;
     color: #ffffff;
     background-color: transparent;
     border: 2px solid #ffffff;
-    transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+    transition: all 0.2s ease-in-out;
     cursor: pointer;
 }
 
-.btn-archive:hover {
+.btn-impact:hover {
     background-color: #ffffff;
-    color: var(--carbon-black);
+    color: #08090a;
+    transform: translateY(-2px);
 }
 
-.btn-filled {
-    background-color: var(--heritage-navy);
-    border-color: var(--heritage-navy);
-    color: var(--warm-cream);
+.btn-forest {
+    background-color: var(--forest-green);
+    border-color: var(--forest-green);
+    color: #ffffff;
 }
 
-.btn-filled:hover {
+.btn-forest:hover {
     background-color: transparent;
-    color: var(--heritage-navy);
-    border-color: var(--heritage-navy);
+    color: var(--forest-green-glow);
+    border-color: var(--forest-green-glow);
 }
 
 /* ==========================================================================
-   HERO SECTION (Uses 2.jpg)
+   NAVIGATION BAR STYLING
    ========================================================================== */
-.hero {
+.main-nav {
+    position: fixed; /* Keeps it locked at the top of the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100; /* Stays above your image vignettes */
+    background: rgba(11, 12, 13, 0.4); /* subtle dark tint */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+}
+
+.nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    font-style: italic;
+    color: #ffffff;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+}
+
+.nav-logo span {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-style: normal;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    margin-left: 0.15rem;
+    color: var(--forest-green-glow);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #b2b8bd;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+}
+
+/* Elegant Pill Call-To-Action inside Nav */
+.nav-links a.nav-cta {
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.nav-links a.nav-cta:hover {
+    background-color: #ffffff;
+    color: #0b0c0d;
+    border-color: #ffffff;
+}
+
+/* Compensate Hero layout spacing for the fixed header */
+.hero-will1 {
+    padding-top: 70px;
+}
+
+/* Responsive updates for small screens */
+@media (max-width: 576px) {
+    .nav-links {
+        gap: 1.25rem;
+    }
+    .nav-links a {
+        font-size: 0.75rem;
+    }
+    .nav-links a.nav-cta {
+        padding: 0.4rem 0.85rem;
+    }
+}
+
+/* ==========================================================================
+   HERO SECTION (Will1 Premium Presentation)
+   ========================================================================== */
+.hero-will1 {
     position: relative;
     height: 100vh;
     display: flex;
@@ -176,112 +287,118 @@ h2 {
     justify-content: center;
     text-align: center;
     background: url('2.jpg') center/cover no-repeat;
-    background-color: #1a1a1a;
+    
+    background-attachment: fixed; 
+    
+    background-color: #050607;
 }
 
-.hero-content {
+.hero-will1 .hero-content {
     position: relative;
     z-index: 2;
 }
 
-.logo-badge {
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.25em;
-    color: var(--warm-cream);
-    border: 1px solid rgba(252, 250, 246, 0.3);
-    padding: 0.4rem 1rem;
-    display: inline-block;
-    margin-bottom: 2rem;
+.logo-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
 }
 
-.archive-logo {
-    font-size: 6.5rem;
-    line-height: 0.85;
-    color: #ffffff;
-}
-
-.hero .subtitle {
-    font-family: 'Cormorant Garamond', serif;
+.main-logo-letter {
+    font-size: 6rem;
+    line-height: 1;
     font-style: italic;
-    font-size: 2.2rem;
-    color: var(--warm-cream);
-    margin-top: 0.5rem;
-    margin-bottom: 2.5rem;
-    text-transform: none;
     font-weight: 400;
+    margin-right: -0.2rem;
+}
+
+.logo-text {
+    text-align: left;
+    margin-top: 1.5rem;
+}
+
+.logo-text h1 {
+    font-size: 2.4rem;
+    line-height: 0.8;
+    letter-spacing: 0.05em;
+}
+
+.logo-text .subtitle {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    margin-top: 0.4rem;
 }
 
 .hero-tagline {
-    font-size: 1.1rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    color: #cbd5e1;
-    margin-bottom: 3.5rem;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: #e3e5e8;
+    margin-bottom: 3rem;
 }
 
 /* ==========================================================================
-   ARCHIVE STORY SECTION (Light Mode Editorial Layout with 5.jpg)
+   EDITORIAL STORY SECTION (Will1 Text + Frame)
    ========================================================================== */
-.archive-story {
-    padding: 10rem 0;
-    background-color: var(--warm-cream);
+.editorial-story {
+    padding: 8rem 0;
+    background-color: #0b0c0d;
 }
 
 .grid-story {
     display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
+    grid-template-columns: 1.2fr 0.8fr;
     gap: 6rem;
     align-items: center;
 }
 
-.journal-signature {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-top: 2.5rem;
-    color: var(--heritage-navy);
-}
-
-.journal-signature .dash {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-style: normal;
-    margin-right: 0.4rem;
-}
-
-/* Clean, modern print-like frame layout for photo 5 */
-.archive-frame {
+.story-image-wrapper {
     position: relative;
-    background-color: #ffffff;
-    padding: 12px;
-    border: 1px solid var(--muted-tan);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
 
-.archive-frame img {
+.image-frame {
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem;
+}
+
+.image-frame::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 40px;
+    height: 40px;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+}
+
+.story-image-wrapper img {
     width: 100%;
+    height: auto;
     display: block;
-    filter: grayscale(15%) contrast(100%);
+    filter: grayscale(10%) contrast(105%);
 }
 
-.archive-meta-tag {
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    color: #8c8576;
-    text-align: center;
-    margin-top: 1rem;
+.signature {
+    font-style: italic;
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-top: 2.5rem;
 }
 
 /* ==========================================================================
-   THE BLUEPRINT SPECS SECTION (3.jpg Background With Premium Blue Slate Block)
+   EXPECT SPECS SECTION (Will2 Grid Progression)
    ========================================================================== */
 .parallax-expect {
     position: relative;
-    padding: 10rem 0;
+    padding: 8rem 0;
     background: url('3.jpg') center/cover no-repeat fixed;
-    background-color: #0e1924;
+    background-color: #0c0d0e;
 }
 
 .expect-content {
@@ -289,88 +406,91 @@ h2 {
     z-index: 2;
 }
 
-.expect-card-archive {
-    background-color: var(--heritage-navy); /* Pure rich navy block layout */
-    padding: 6rem 5rem;
-    border: 1px solid rgba(252, 250, 246, 0.1);
+.expect-card-impact {
+    /* 1. Drop the background opacity to let light/image shapes pass through */
+    background-color: rgba(11, 12, 13, 0.25); 
+    
+    /* 2. Add the hardware-accelerated blur effect */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    
+    /* Keep your existing styles intact */
+    border-top: 4px solid var(--forest-green);
+    padding: 50px 40px; /* equivalent to 5rem 4rem */
 }
 
-.expect-card-archive h2 {
-    color: var(--warm-cream);
-    margin-top: 0.5rem;
-    border-bottom: 1px solid rgba(252, 250, 246, 0.15);
-    padding-bottom: 2rem;
-}
-
-.archive-list {
-    list-style: none;
+.expect-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 3.5rem 5rem;
+    gap: 3rem 4rem;
     margin-top: 3.5rem;
 }
 
-.archive-list li strong {
-    display: block;
-    font-size: 1.2rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    color: var(--warm-cream);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
+.expect-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
 }
 
-.archive-list li p {
-    color: #b9cbe0;
+.expect-item .num {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--forest-green-glow);
+    line-height: 1;
+}
+
+.expect-item h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+}
+
+.expect-item p {
     font-size: 0.95rem;
-    line-height: 1.65;
+    color: #a3a3a3;
     margin: 0;
 }
 
 /* ==========================================================================
-   CALL TO ACTION BANNER (4.jpg Background)
+   CALL TO ACTION BANNER (Will2 Massive Bold Impact)
    ========================================================================== */
-.cta-banner-archive {
+.cta-banner-impact {
     position: relative;
     padding: 14rem 0;
     text-align: center;
     background: url('4.jpg') center/cover no-repeat;
-    background-color: #1a1a1a;
+    background-color: #040506;
 }
 
-.cta-banner-archive .cta-content {
+.cta-banner-impact .cta-content {
     position: relative;
     z-index: 2;
-    max-width: 700px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
-.massive-serif {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-size: 4.5rem;
-    font-weight: 500;
-    color: var(--warm-cream);
-    text-transform: none;
-    line-height: 0.95;
+.massive-heading {
+    font-size: 6rem;
+    line-height: 0.85;
     margin-bottom: 1.5rem;
 }
 
-.cta-banner-archive p {
-    font-size: 1.05rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: #e2e8f0;
+.cta-banner-impact p {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #e5e7eb;
     margin-bottom: 3.5rem;
 }
 
 /* ==========================================================================
-   FOOTER
+   FOOTER (Will2 Style)
    ========================================================================== */
-footer {
-    background-color: #111822;
-    padding: 3.5rem 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.02);
+.footer-will2 {
+    background-color: #040506;
+    padding: 3rem 0;
+    border-top: 1px solid var(--border-gray);
 }
 
 .footer-layout {
@@ -380,28 +500,23 @@ footer {
 }
 
 .footer-logo {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 900;
-    font-size: 1.2rem;
-    letter-spacing: 0.05em;
+    font-size: 1.6rem;
+    font-style: italic;
     color: #ffffff;
     margin: 0;
 }
 
 .footer-logo span {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 400;
-    color: #8c8576;
-    font-size: 1rem;
-    margin-left: 0.4rem;
+    color: var(--forest-green-glow);
 }
 
-footer .copy {
-    font-size: 0.7rem;
+.footer-will2 .copy {
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.15em;
-    color: #5d6775;
+    letter-spacing: 0.1em;
+    color: #525252;
     margin: 0;
 }
 
@@ -411,22 +526,22 @@ footer .copy {
 @media (max-width: 992px) {
     .grid-story {
         grid-template-columns: 1fr;
-        gap: 5rem;
+        gap: 4rem;
     }
 
     .story-image-wrapper {
+        order: -1;
         max-width: 500px;
         margin: 0 auto;
-        order: -1; /* Flips image on top for dynamic viewport layout */
     }
 
-    .archive-list {
+    .expect-grid {
         grid-template-columns: 1fr;
         gap: 2.5rem;
     }
 
-    .expect-card-archive {
-        padding: 4rem 2.5rem;
+    .expect-card-impact {
+        padding: 3.5rem 2rem;
     }
 
     .parallax-expect {
@@ -435,27 +550,31 @@ footer .copy {
 }
 
 @media (max-width: 576px) {
-    .archive-logo {
-        font-size: 3.8rem;
+    .main-logo-letter {
+        font-size: 4.5rem;
     }
 
-    .hero .subtitle {
-        font-size: 1.6rem;
+    .logo-text h1 {
+        font-size: 1.8rem;
     }
 
-    h2 {
-        font-size: 2.3rem;
+    .hero-tagline {
+        font-size: 1.25rem;
     }
 
-    .massive-serif {
-        font-size: 3.2rem;
+    .editorial-story h2 {
+        font-size: 2rem;
     }
 
-    .archive-story {
-        padding: 6rem 0;
+    .parallax-expect h2 {
+        font-size: 2.4rem;
     }
 
-    .cta-banner-archive {
+    .massive-heading {
+        font-size: 3.4rem;
+    }
+
+    .cta-banner-impact {
         padding: 10rem 0;
     }
 
