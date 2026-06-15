@@ -1,0 +1,467 @@
+/* ==========================================================================
+   RESET & ARCHIVE GLOBAL SETUP
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Root Design Variables: Heritage / Vintage Athletic / Premium Archive */
+:root {
+    --heritage-navy: #112233;   /* Deep premium vintage navy blue */
+    --warm-cream: #fcfaf6;     /* Soft high-end paper white background */
+    --carbon-black: #1a1a1a;   /* Rich editorial print text color */
+    --muted-tan: #e6e0d4;      /* Page divider lines and border frame */
+}
+
+body {
+    background-color: var(--warm-cream);
+    color: var(--carbon-black);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Background Image Overlays (Combines Gradient with Blue Tint) */
+.archive-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Layer 1: Dark blue transparent tint layer over background image */
+    background-color: rgba(17, 34, 51, 0.25);
+    /* Layer 2: Smooth editorial fade gradient down into body layout */
+    background-image: linear-gradient(180deg, rgba(17,34,51,0.2) 0%, rgba(26,26,26,0.85) 100%);
+    z-index: 1;
+}
+
+.navy-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Deeper blend overlay for the middle section background image */
+    background: rgba(17, 34, 51, 0.92);
+    z-index: 1;
+}
+
+/* Inline Graphic Tint Treatment for Photo 5 */
+.image-tint-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.image-blue-tint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(17, 34, 51, 0.25); /* Almost transparent dark blue layer */
+    pointer-events: none; /* Allows cursor hover to bypass tint wrapper */
+    transition: background-color 0.4s ease;
+}
+
+.archive-frame:hover .image-blue-tint {
+    background-color: rgba(17, 34, 51, 0.05); /* Lightens slightly on hover */
+}
+
+/* ==========================================================================
+   TYPOGRAPHY & EDITORIAL TAGS
+   ========================================================================== */
+h1, h2, h3, .massive-serif {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--heritage-navy);
+}
+
+h2 {
+    font-size: 3rem;
+    line-height: 1.05;
+    margin-bottom: 2rem;
+}
+
+.italic-serif {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    text-transform: none;
+    font-style: italic;
+    letter-spacing: 0;
+}
+
+/* Beautiful Book Journal Text Style */
+.story-text p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: #333333;
+    font-weight: 500;
+    margin-bottom: 1.6rem;
+}
+
+.section-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: var(--heritage-navy);
+    margin-bottom: 1.2rem;
+}
+
+.section-label.text-cream {
+    color: var(--warm-cream);
+    opacity: 0.8;
+}
+
+/* ==========================================================================
+   ARCHIVE BUTTONS
+   ========================================================================== */
+.btn-archive {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    background-color: transparent;
+    border: 2px solid #ffffff;
+    transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+    cursor: pointer;
+}
+
+.btn-archive:hover {
+    background-color: #ffffff;
+    color: var(--carbon-black);
+}
+
+.btn-filled {
+    background-color: var(--heritage-navy);
+    border-color: var(--heritage-navy);
+    color: var(--warm-cream);
+}
+
+.btn-filled:hover {
+    background-color: transparent;
+    color: var(--heritage-navy);
+    border-color: var(--heritage-navy);
+}
+
+/* ==========================================================================
+   HERO SECTION (Uses 2.jpg)
+   ========================================================================== */
+.hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: url('2.jpg') center/cover no-repeat;
+    background-color: #1a1a1a;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.logo-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    color: var(--warm-cream);
+    border: 1px solid rgba(252, 250, 246, 0.3);
+    padding: 0.4rem 1rem;
+    display: inline-block;
+    margin-bottom: 2rem;
+}
+
+.archive-logo {
+    font-size: 6.5rem;
+    line-height: 0.85;
+    color: #ffffff;
+}
+
+.hero .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 2.2rem;
+    color: var(--warm-cream);
+    margin-top: 0.5rem;
+    margin-bottom: 2.5rem;
+    text-transform: none;
+    font-weight: 400;
+}
+
+.hero-tagline {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: #cbd5e1;
+    margin-bottom: 3.5rem;
+}
+
+/* ==========================================================================
+   ARCHIVE STORY SECTION (Light Mode Editorial Layout with 5.jpg)
+   ========================================================================== */
+.archive-story {
+    padding: 10rem 0;
+    background-color: var(--warm-cream);
+}
+
+.grid-story {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 6rem;
+    align-items: center;
+}
+
+.journal-signature {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    color: var(--heritage-navy);
+}
+
+.journal-signature .dash {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-style: normal;
+    margin-right: 0.4rem;
+}
+
+/* Clean, modern print-like frame layout for photo 5 */
+.archive-frame {
+    position: relative;
+    background-color: #ffffff;
+    padding: 12px;
+    border: 1px solid var(--muted-tan);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.archive-frame img {
+    width: 100%;
+    display: block;
+    filter: grayscale(15%) contrast(100%);
+}
+
+.archive-meta-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #8c8576;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* ==========================================================================
+   THE BLUEPRINT SPECS SECTION (3.jpg Background With Premium Blue Slate Block)
+   ========================================================================== */
+.parallax-expect {
+    position: relative;
+    padding: 10rem 0;
+    background: url('3.jpg') center/cover no-repeat fixed;
+    background-color: #0e1924;
+}
+
+.expect-content {
+    position: relative;
+    z-index: 2;
+}
+
+.expect-card-archive {
+    background-color: var(--heritage-navy); /* Pure rich navy block layout */
+    padding: 6rem 5rem;
+    border: 1px solid rgba(252, 250, 246, 0.1);
+}
+
+.expect-card-archive h2 {
+    color: var(--warm-cream);
+    margin-top: 0.5rem;
+    border-bottom: 1px solid rgba(252, 250, 246, 0.15);
+    padding-bottom: 2rem;
+}
+
+.archive-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem 5rem;
+    margin-top: 3.5rem;
+}
+
+.archive-list li strong {
+    display: block;
+    font-size: 1.2rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    color: var(--warm-cream);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.archive-list li p {
+    color: #b9cbe0;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* ==========================================================================
+   CALL TO ACTION BANNER (4.jpg Background)
+   ========================================================================== */
+.cta-banner-archive {
+    position: relative;
+    padding: 14rem 0;
+    text-align: center;
+    background: url('4.jpg') center/cover no-repeat;
+    background-color: #1a1a1a;
+}
+
+.cta-banner-archive .cta-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.massive-serif {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 4.5rem;
+    font-weight: 500;
+    color: var(--warm-cream);
+    text-transform: none;
+    line-height: 0.95;
+    margin-bottom: 1.5rem;
+}
+
+.cta-banner-archive p {
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: #e2e8f0;
+    margin-bottom: 3.5rem;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+footer {
+    background-color: #111822;
+    padding: 3.5rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.footer-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+    margin: 0;
+}
+
+.footer-logo span {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: #8c8576;
+    font-size: 1rem;
+    margin-left: 0.4rem;
+}
+
+footer .copy {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #5d6775;
+    margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (TABLETS & MOBILE)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .grid-story {
+        grid-template-columns: 1fr;
+        gap: 5rem;
+    }
+
+    .story-image-wrapper {
+        max-width: 500px;
+        margin: 0 auto;
+        order: -1; /* Flips image on top for dynamic viewport layout */
+    }
+
+    .archive-list {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .expect-card-archive {
+        padding: 4rem 2.5rem;
+    }
+
+    .parallax-expect {
+        background-attachment: scroll;
+    }
+}
+
+@media (max-width: 576px) {
+    .archive-logo {
+        font-size: 3.8rem;
+    }
+
+    .hero .subtitle {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 2.3rem;
+    }
+
+    .massive-serif {
+        font-size: 3.2rem;
+    }
+
+    .archive-story {
+        padding: 6rem 0;
+    }
+
+    .cta-banner-archive {
+        padding: 10rem 0;
+    }
+
+    .footer-layout {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}

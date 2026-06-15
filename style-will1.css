@@ -1,0 +1,370 @@
+/* ==========================================================================
+   RESET & SETUP
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #0b0c0d;
+    color: #e3e5e8;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Reusable Dark Overlay for Image Sections */
+.vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(11,12,13,0.6) 0%, rgba(11,12,13,0.9) 100%),
+                radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(11,12,13,0.95) 100%);
+    z-index: 1;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY & BUTTONS
+   ========================================================================== */
+h1, h2, .main-logo-letter, .italic-heading {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+}
+
+h2 {
+    font-size: 2.5rem;
+    line-height: 1.25;
+    margin-bottom: 2rem;
+}
+
+p {
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+    color: #b2b8bd;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.95rem 2.25rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn:hover {
+    background-color: #ffffff;
+    color: #0b0c0d;
+}
+
+.btn-solid {
+    background-color: #ffffff;
+    color: #0b0c0d;
+}
+
+.btn-solid:hover {
+    background-color: transparent;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   HERO SECTION (Uses 2.jpg Background)
+   ========================================================================== */
+.hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: url('2.jpg') center/cover no-repeat;
+    background-color: #050607;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.logo-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.main-logo-letter {
+    font-size: 6rem;
+    line-height: 1;
+    font-style: italic;
+    font-weight: 400;
+    margin-right: -0.2rem;
+}
+
+.logo-text {
+    text-align: left;
+    margin-top: 1.5rem;
+}
+
+.logo-text h1 {
+    font-size: 2.4rem;
+    line-height: 0.8;
+    letter-spacing: 0.05em;
+}
+
+.logo-text .subtitle {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    margin-top: 0.4rem;
+}
+
+.hero-tagline {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+    color: #e3e5e8;
+    margin-bottom: 3rem;
+}
+
+/* ==========================================================================
+   EDITORIAL STORY SECTION (Text Layout with 5.jpg Inline Frame)
+   ========================================================================== */
+.editorial-story {
+    padding: 8rem 0;
+    background-color: #0b0c0d;
+}
+
+.grid-story {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 6rem;
+    align-items: center;
+}
+
+.story-image-wrapper {
+    position: relative;
+}
+
+/* Creates a sophisticated off-center framing element behind photo 5 */
+.image-frame {
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem;
+}
+
+.image-frame::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    width: 40px;
+    height: 40px;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+}
+
+.story-image-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: grayscale(10%) contrast(105%);
+}
+
+.signature {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    color: #ffffff;
+    margin-top: 2.5rem;
+}
+
+/* ==========================================================================
+   EXPECT SECTION (3.jpg Parallax Background)
+   ========================================================================== */
+.parallax-expect {
+    position: relative;
+    padding: 10rem 0;
+    background: url('3.jpg') center/cover no-repeat fixed;
+    background-color: #070809;
+}
+
+.expect-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-end; /* Places this container beautifully on the right side */
+}
+
+.expect-card {
+    background-color: rgba(11, 12, 13, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 4.5rem;
+    width: 100%;
+    max-width: 680px;
+    backdrop-filter: blur(15px);
+}
+
+.expect-list {
+    list-style: none;
+    margin-top: 2.5rem;
+}
+
+.expect-list li {
+    margin-bottom: 2rem;
+    position: relative;
+    padding-left: 1.8rem;
+}
+
+.expect-list li:last-child {
+    margin-bottom: 0;
+}
+
+.expect-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: -2px;
+    color: #ffffff;
+    font-size: 1.4rem;
+}
+
+.expect-list li strong {
+    display: block;
+    font-size: 1.15rem;
+    color: #ffffff;
+    margin-bottom: 0.35rem;
+}
+
+.expect-list li p {
+    font-size: 0.95rem;
+    margin: 0;
+    color: #b2b8bd;
+}
+
+/* ==========================================================================
+   CALL TO ACTION BANNER (4.jpg Background)
+   ========================================================================== */
+.cta-banner {
+    position: relative;
+    padding: 12rem 0;
+    text-align: center;
+    background: url('4.jpg') center/cover no-repeat;
+    background-color: #050607;
+}
+
+.cta-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.italic-heading {
+    font-style: italic;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.cta-banner p {
+    font-size: 1.15rem;
+    color: #e3e5e8;
+    margin-bottom: 2.5rem;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+footer {
+    text-align: center;
+    padding: 4rem 0;
+    background-color: #070809;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+footer p {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (TABLETS & MOBILE)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .grid-story {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+
+    .story-image-wrapper {
+        order: -1; /* Puts photo above text layout on tablet/mobile screens */
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .parallax-expect {
+        padding: 5rem 0;
+        background-attachment: scroll; /* Smooth scrolling performance on mobile */
+    }
+
+    .expect-content {
+        justify-content: center;
+    }
+
+    .expect-card {
+        padding: 2.5rem 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    h2 {
+        font-size: 2rem;
+    }
+
+    .italic-heading {
+        font-size: 2.25rem;
+    }
+
+    .main-logo-letter {
+        font-size: 4.5rem;
+    }
+
+    .logo-text h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero-tagline {
+        font-size: 1.25rem;
+    }
+
+    .cta-banner {
+        padding: 8rem 0;
+    }
+}
