@@ -1,5 +1,5 @@
 /* ==========================================================================
-   RESET & COMBINED GLOBAL SETUP
+   RESET & SPORTY GLOBAL SETUP
    ========================================================================== */
 * {
     margin: 0;
@@ -12,10 +12,10 @@ html {
 }
 
 body {
-    background-color: #0b0c0d; /* Carbon dark base */
-    color: #e3e5e8;
+    background-color: #08090a; /* Stark carbon black */
+    color: #e5e7eb;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    line-height: 1.75;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
@@ -27,7 +27,7 @@ body {
     padding: 0 2rem;
 }
 
-/* Color Tokens - Swapped Dark Orange out for Forest Green */
+/* Premium Forest Green Variations */
 :root {
     --forest-green: #1b4332; 
     --forest-green-glow: #2d6a4f;
@@ -35,15 +35,14 @@ body {
     --border-gray: #232629;
 }
 
-/* Overlays */
+/* Vignette Gradients */
 .vignette {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(180deg, rgba(11,12,13,0.6) 0%, rgba(11,12,13,0.9) 100%),
-                radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(11,12,13,0.95) 100%);
+    background: linear-gradient(180deg, rgba(8,9,10,0.5) 0%, rgba(8,9,10,0.95) 100%);
     z-index: 1;
 }
 
@@ -58,56 +57,123 @@ body {
 }
 
 /* ==========================================================================
-   WILL1 TYPOGRAPHY & BUTTONS (Editorial / Elegant)
+   NAVIGATION BAR (Sporty Minimalist Theme)
    ========================================================================== */
-.hero-will1 h1, 
-.hero-will1 .main-logo-letter, 
-.editorial-story h2, 
-.signature {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    background: rgba(8, 9, 10, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-gray);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.1rem 2rem;
+}
+
+.nav-logo {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-size: 1.6rem;
+    font-style: italic;
     color: #ffffff;
-    letter-spacing: -0.01em;
+    text-decoration: none;
+    letter-spacing: 0.05em;
 }
 
-.editorial-story h2 {
-    font-size: 2.5rem;
-    line-height: 1.25;
-    margin-bottom: 2rem;
+.nav-logo span {
+    color: var(--forest-green-glow);
 }
 
-.editorial-story p {
-    margin-bottom: 1.5rem;
-    font-size: 1.05rem;
-    color: #b2b8bd;
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
 }
 
-.btn-editorial {
-    display: inline-block;
-    padding: 0.95rem 2.25rem;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
+.nav-links a {
+    text-decoration: none;
+    color: #a3a3a3;
+    font-size: 0.8rem;
+    font-weight: 800;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    text-decoration: none;
-    color: #ffffff;
-    border: 1px solid #ffffff;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: color 0.2s ease;
 }
 
-.btn-editorial:hover {
-    background-color: #ffffff;
-    color: #0b0c0d;
+.nav-links a:hover {
+    color: #ffffff;
+}
+
+.nav-links a.nav-cta {
+    color: #ffffff;
+    border: 2px solid var(--forest-green);
+    background-color: var(--forest-green);
+    padding: 0.45rem 1.25rem;
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+}
+
+.nav-links a.nav-cta:hover {
+    background-color: transparent;
+    border-color: var(--forest-green-glow);
+    color: var(--forest-green-glow);
 }
 
 /* ==========================================================================
-   WILL2 TYPOGRAPHY & TAGS (Athletic / High-Impact Focus)
+   LOGO IMAGE CONTAINERS & RESPONSIVE SCALING
    ========================================================================== */
-.parallax-expect h2,
-.parallax-expect h3,
-.cta-banner-impact h2,
-.massive-heading {
+
+/* Navigation Logo Sizing */
+.nav-logo-img img {
+    height: 35px; /* Adjust this height value to perfectly match your logo's aspect ratio */
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Hero Center Logo Sizing */
+.hero-main-logo {
+    max-width: 650px; /* Limits width to keep it looking clean on desktop viewports */
+    width: 100%;
+    margin: 0 auto 2rem auto;
+    padding: 0 1rem;
+}
+
+.hero-main-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Mobile responsive adjustments for the hero logo image */
+@media (max-width: 576px) {
+    .hero-main-logo {
+        max-width: 320px; /* Scales down smoothly on mobile screens */
+    }
+    .nav-logo-img img {
+        height: 28px; /* Slightly more compact navigation signature on phones */
+    }
+}
+
+/* ==========================================================================
+   ATHLETIC TYPOGRAPHY COMPONENTS
+   ========================================================================== */
+h1, h2, h3, .massive-heading {
     font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 900;
     text-transform: uppercase;
@@ -116,7 +182,7 @@ body {
     color: #ffffff;
 }
 
-.parallax-expect h2 {
+h2 {
     font-size: 3.5rem;
     line-height: 0.95;
     margin-bottom: 2rem;
@@ -124,6 +190,13 @@ body {
 
 .highlight {
     color: var(--forest-green-glow);
+}
+
+p {
+    font-size: 1rem;
+    color: #a3a3a3;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
 }
 
 .section-tag {
@@ -143,6 +216,9 @@ body {
     border-left-color: var(--forest-green-glow);
 }
 
+/* ==========================================================================
+   HIGH-IMPACT INTERACTIVE BUTTONS
+   ========================================================================== */
 .btn-impact {
     display: inline-block;
     padding: 1.1rem 2.5rem;
@@ -179,107 +255,9 @@ body {
 }
 
 /* ==========================================================================
-   NAVIGATION BAR STYLING
+   HERO SECTION (Will2 Configuration with Locked Background Position)
    ========================================================================== */
-.main-nav {
-    position: fixed; /* Keeps it locked at the top of the viewport */
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100; /* Stays above your image vignettes */
-    background: rgba(11, 12, 13, 0.4); /* subtle dark tint */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-}
-
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.25rem 2rem;
-}
-
-.nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 1.5rem;
-    font-style: italic;
-    color: #ffffff;
-    text-decoration: none;
-    letter-spacing: -0.02em;
-}
-
-.nav-logo span {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-style: normal;
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    margin-left: 0.15rem;
-    color: var(--forest-green-glow);
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #b2b8bd;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: #ffffff;
-}
-
-/* Elegant Pill Call-To-Action inside Nav */
-.nav-links a.nav-cta {
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.5rem 1.25rem;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-}
-
-.nav-links a.nav-cta:hover {
-    background-color: #ffffff;
-    color: #0b0c0d;
-    border-color: #ffffff;
-}
-
-/* Compensate Hero layout spacing for the fixed header */
-.hero-will1 {
-    padding-top: 70px;
-}
-
-/* Responsive updates for small screens */
-@media (max-width: 576px) {
-    .nav-links {
-        gap: 1.25rem;
-    }
-    .nav-links a {
-        font-size: 0.75rem;
-    }
-    .nav-links a.nav-cta {
-        padding: 0.4rem 0.85rem;
-    }
-}
-
-/* ==========================================================================
-   HERO SECTION (Will1 Premium Presentation)
-   ========================================================================== */
-.hero-will1 {
+.hero-will2 {
     position: relative;
     height: 100vh;
     display: flex;
@@ -287,112 +265,132 @@ body {
     justify-content: center;
     text-align: center;
     background: url('2.jpg') center/cover no-repeat;
-    
-    background-attachment: fixed; 
-    
-    background-color: #050607;
+    background-attachment: fixed; /* Parallax effect rule */
+    background-color: #040506;
+    padding-top: 70px;
 }
 
-.hero-will1 .hero-content {
+.hero-will2 .hero-content {
     position: relative;
     z-index: 2;
+    padding: 0 1rem;
 }
 
-.logo-wrapper {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
+.logo-accent-tag {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    color: var(--forest-green-glow);
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
-.main-logo-letter {
-    font-size: 6rem;
-    line-height: 1;
-    font-style: italic;
-    font-weight: 400;
-    margin-right: -0.2rem;
-}
-
-.logo-text {
-    text-align: left;
-    margin-top: 1.5rem;
-}
-
-.logo-text h1 {
-    font-size: 2.4rem;
+.impact-logo {
+    font-size: 8rem;
     line-height: 0.8;
-    letter-spacing: 0.05em;
+    letter-spacing: -0.01em;
+    margin: 0;
 }
 
-.logo-text .subtitle {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.28em;
+.hero-will2 .subtitle {
+    font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: 0.25em;
     color: #ffffff;
-    margin: 0;
-    margin-top: 0.4rem;
+    margin-top: -0.2rem;
+    margin-bottom: 2rem;
 }
 
 .hero-tagline {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1.6rem;
-    color: #e3e5e8;
-    margin-bottom: 3rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #d1d5db;
+    margin-bottom: 3.5rem;
+}
+
+.bottom-stripe {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: var(--forest-green);
+    z-index: 2;
 }
 
 /* ==========================================================================
-   EDITORIAL STORY SECTION (Will1 Text + Frame)
+   THE MISSION SECTION (Sporty Content Grid Transition)
    ========================================================================== */
-.editorial-story {
-    padding: 8rem 0;
-    background-color: #0b0c0d;
+.sport-story {
+    padding: 10rem 0;
+    background-color: #08090a;
 }
 
 .grid-story {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 6rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem;
     align-items: center;
 }
 
-.story-image-wrapper {
-    position: relative;
-}
-
-.image-frame {
-    position: relative;
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 1rem;
-}
-
-.image-frame::before {
-    content: '';
-    position: absolute;
-    top: -15px;
-    left: -15px;
-    width: 40px;
-    height: 40px;
-    border-top: 2px solid #ffffff;
+.coach-badge {
+    display: inline-flex;
+    flex-direction: column;
+    margin-top: 2rem;
     border-left: 2px solid #ffffff;
+    padding-left: 1rem;
 }
 
-.story-image-wrapper img {
-    width: 100%;
-    height: auto;
-    display: block;
-    filter: grayscale(10%) contrast(105%);
+.coach-badge .title-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #737373;
 }
 
-.signature {
+.coach-badge .name-label {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
     font-style: italic;
-    font-size: 1.4rem;
     color: #ffffff;
-    margin-top: 2.5rem;
+}
+
+/* Sharp Image Frame Presentation */
+.image-container-impact {
+    position: relative;
+    overflow: hidden;
+}
+
+.image-container-impact img {
+    width: 100%;
+    display: block;
+    filter: grayscale(100%) contrast(120%);
+    transition: filter 0.4s ease;
+}
+
+.image-container-impact:hover img {
+    filter: grayscale(0%) contrast(105%);
+}
+
+.badge-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--forest-green);
+    color: #ffffff;
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 1rem;
 }
 
 /* ==========================================================================
-   EXPECT SPECS SECTION (Will2 Grid Progression)
+   PROGRAM SPECS SECTION (Fixed Background With Blurry Card Overlap)
    ========================================================================== */
 .parallax-expect {
     position: relative;
@@ -407,16 +405,11 @@ body {
 }
 
 .expect-card-impact {
-    /* 1. Drop the background opacity to let light/image shapes pass through */
-    background-color: rgba(11, 12, 13, 0.25); 
-    
-    /* 2. Add the hardware-accelerated blur effect */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* Safari support */
-    
-    /* Keep your existing styles intact */
+    background-color: rgba(11, 12, 13, 0.75); /* Tinted transparent background */
+    backdrop-filter: blur(12px); /* Blurry structural layer */
+    -webkit-backdrop-filter: blur(12px);
     border-top: 4px solid var(--forest-green);
-    padding: 50px 40px; /* equivalent to 5rem 4rem */
+    padding: 5rem 4rem;
 }
 
 .expect-grid {
@@ -448,12 +441,11 @@ body {
 
 .expect-item p {
     font-size: 0.95rem;
-    color: #a3a3a3;
     margin: 0;
 }
 
 /* ==========================================================================
-   CALL TO ACTION BANNER (Will2 Massive Bold Impact)
+   CALL TO ACTION BANNER (Massive Athletic Impact)
    ========================================================================== */
 .cta-banner-impact {
     position: relative;
@@ -485,7 +477,7 @@ body {
 }
 
 /* ==========================================================================
-   FOOTER (Will2 Style)
+   FOOTER (Will2 Base)
    ========================================================================== */
 .footer-will2 {
     background-color: #040506;
@@ -530,8 +522,7 @@ body {
     }
 
     .story-image-wrapper {
-        order: -1;
-        max-width: 500px;
+        max-width: 550px;
         margin: 0 auto;
     }
 
@@ -550,28 +541,32 @@ body {
 }
 
 @media (max-width: 576px) {
-    .main-logo-letter {
-        font-size: 4.5rem;
+    .main-nav .nav-links {
+        gap: 1.25rem;
+    }
+    
+    .main-nav .nav-links a {
+        font-size: 0.7rem;
     }
 
-    .logo-text h1 {
-        font-size: 1.8rem;
+    .impact-logo {
+        font-size: 4.8rem;
     }
 
-    .hero-tagline {
-        font-size: 1.25rem;
+    .hero-will2 .subtitle {
+        font-size: 1.5rem;
     }
 
-    .editorial-story h2 {
-        font-size: 2rem;
-    }
-
-    .parallax-expect h2 {
+    h2 {
         font-size: 2.4rem;
     }
 
     .massive-heading {
         font-size: 3.4rem;
+    }
+
+    .sport-story {
+        padding: 6rem 0;
     }
 
     .cta-banner-impact {
