@@ -12,15 +12,21 @@
 </head>
 <body>
 
-<!-- ==========================================================================
-       NAVIGATION BAR
+    <!-- ==========================================================================
+       NAVIGATION BAR (With Mobile Menu Architecture)
        ========================================================================== -->
     <nav class="main-nav">
         <div class="nav-container">
-            <!-- Swapped text logo for your PNG asset -->
             <a href="#" class="nav-logo-img">
                 <img src="WhiteLogo.PNG" alt="Highlands Endurance Club Logo">
             </a>
+            
+            <!-- Pure CSS Mobile Hamburger Interface Toggle -->
+            <input type="checkbox" id="nav-toggle" class="nav-toggle">
+            <label for="nav-toggle" class="nav-toggle-label">
+                <span></span>
+            </label>
+
             <div class="nav-links">
                 <a href="#about">The Mission</a>
                 <a href="#expect">Program Specs</a>
@@ -36,7 +42,6 @@
         <div class="vignette"></div>
         <div class="hero-content">
             <div class="logo-wrapper-sport">
-                <!-- Swapped massive text headers for the hero logo asset -->
                 <div class="hero-main-logo">
                     <img src="WhiteLogo.PNG" alt="Highlands Endurance Club">
                 </div>
@@ -48,6 +53,7 @@
         </div>
         <div class="bottom-stripe"></div>
     </header>
+
     <!-- ==========================================================================
        SECTION 1: THE MISSION (Will2 Aggressive Text Grid & Image Crop)
        ========================================================================== -->
