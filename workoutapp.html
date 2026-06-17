@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Training Planner - Dark Blue</title>
+    <!-- Chart.js CDN for clean rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Dark Blue Theme Palette */
+            --bg-primary: #0b0f19;      /* Deep obsidian blue background */
+            --bg-card: #1e293b;         /* Slate blue card background */
+            --bg-header: #111827;       /* Darker grey-blue for main header */
+            --text-main: #f8fafc;       /* Off-white text */
+            --text-muted: #94a3b8;      /* Muted slate text */
+            --accent: #3b82f6;          /* Vibrant electric blue */
+            --accent-hover: #2563eb;    /* Darker blue hover state */
+            --border-color: #334155;    /* Border lines that pop on dark */
+            
+            /* Dark Mode Workout Type Colors */
+            --col-easy: rgba(34, 197, 94, 0.15);      --txt-easy: #4ade80;      --brd-easy: #22c55e;
+            --col-intervals: rgba(239, 68, 68, 0.15); --txt-intervals: #f87171; --brd-intervals: #ef4444;
+            --col-long: rgba(59, 130, 246, 0.15);     --txt-long: #60a5fa;      --brd-long: #3b82f6;
+            --col-strength: rgba(234, 179, 8, 0.15);  --txt-strength: #fde047;  --brd-strength: #eab308;
+            --col-rest: rgba(148, 163, 184, 0.1);     --txt-rest: #cbd5e1;      --brd-rest: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Top Dashboard Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-header);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            min-width: 280px;
+        }
+
+        /* Customizable Title Box Style */
+        .editable-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            border: 1px dashed transparent;
+            padding: 2px 6px;
+            margin-left: -6px;
+            border-radius: 4px;
+            cursor: text;
+            transition: background 0.2s, border-color 0.2s;
+            display: inline-block;
+            min-width: 250px;
+        }
+
+        .editable-title:hover {
+            background: #1e293b;
+            border-color: var(--text-muted);
+        }
+
+        .editable-title:focus {
+            outline: none;
+            background: #0f172a;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Customizable Subtitle Box Style */
+        .editable-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border: 1px dashed transparent;
+            padding: 2px 6px;
+            margin-left: -6px;
+            margin-top: 2px;
+            border-radius: 4px;
+            cursor: text;
+            transition: background 0.2s, border-color 0.2s;
+            display: inline-block;
+            min-width: 250px;
+        }
+
+        .editable-subtitle:hover {
+            background: #1e293b;
+            border-color: var(--text-muted);
+            color: #fff;
+        }
+
+        .editable-subtitle:focus {
+            outline: none;
+            background: #0f172a;
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Center Navigation Component and PDF Trigger */
+        .calendar-center-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #0f172a;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .view-switcher {
+            display: flex;
+            background: var(--bg-primary);
+            padding: 2px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .switch-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.3rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .switch-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .nav-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .pdf-btn {
+            background: #10b981;
+            border: 1px solid #059669;
+            color: white;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s;
+        }
+
+        .pdf-btn:hover {
+            background: #059669;
+        }
+
+        .current-week-display {
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 200px;
+            text-align: center;
+            color: #60a5fa;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat-box {
+            background: #0f172a;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 100px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-box span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-box strong {
+            font-size: 1.1rem;
+            color: #38bdf8;
+        }
+
+        /* Weekly / Monthly Layout Engine Grid */
+        main {
+            display: grid;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        main.view-week {
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        main.view-month {
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        main.view-stats {
+            grid-template-columns: 1fr;
+        }
+
+        @media (max-width: 1200px) {
+            main.view-week, main.view-month {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        .day-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 450px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+
+        main.view-month .day-card {
+            min-height: 180px;
+        }
+
+        .day-card.out-of-bounds {
+            opacity: 0.35;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent);
+        }
+
+        .day-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: #111827;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        main.view-month .day-header {
+            padding: 0.5rem 0.75rem;
+        }
+
+        .day-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .day-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .workout-list {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        main.view-month .workout-list {
+            padding: 0.4rem;
+            gap: 0.35rem;
+        }
+
+        /* Click Action Hint */
+        .add-hint {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            color: #60a5fa;
+            font-weight: 500;
+            border-top: 1px dashed var(--border-color);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .day-card:hover .add-hint {
+            opacity: 1;
+        }
+
+        /* Workout Item Card */
+        .workout-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            position: relative;
+            border-left: 4px solid transparent;
+            cursor: default;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        main.view-month .workout-item {
+            padding: 0.4rem;
+            border-radius: 5px;
+        }
+
+        /* Dynamic Workout Themes */
+        .type-easy { background: var(--col-easy); color: var(--txt-easy); border-left-color: var(--brd-easy); }
+        .type-intervals { background: var(--col-intervals); color: var(--txt-intervals); border-left-color: var(--brd-intervals); }
+        .type-long { background: var(--col-long); color: var(--txt-long); border-left-color: var(--brd-long); }
+        .type-strength { background: var(--col-strength); color: var(--txt-strength); border-left-color: var(--brd-strength); }
+        .type-rest { background: var(--col-rest); color: var(--txt-rest); border-left-color: var(--brd-rest); }
+
+        .workout-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.05em;
+        }
+
+        main.view-month .workout-top {
+            font-size: 0.65rem;
+        }
+
+        .workout-metrics {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        main.view-month .workout-metrics {
+            font-size: 0.8rem;
+            margin-bottom: 0;
+        }
+
+        .workout-splits-hint {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+            font-style: italic;
+        }
+
+        main.view-month .workout-splits-hint {
+            font-size: 0.65rem;
+        }
+
+        .workout-notes {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            word-break: break-word;
+        }
+
+        main.view-month .workout-notes {
+            display: none;
+        }
+
+        .workout-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 0.4rem;
+        }
+
+        main.view-month .workout-actions {
+            margin-top: 0.25rem;
+            padding-top: 0.15rem;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-inline-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        .action-inline-btn:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .edit-btn { color: var(--accent); }
+        .delete-btn { color: #ef4444; }
+
+        /* --- STATS VIEWS SUB-LAYOUT ENGINE --- */
+        .analytics-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .analytics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .analytics-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .analytics-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            margin: auto;
+            min-height: 280px;
+        }
+
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .macro-item {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .macro-item.m-easy { border-left: 4px solid var(--brd-easy); }
+        .macro-item.m-intervals { border-left: 4px solid var(--brd-intervals); }
+        .macro-item.m-long { border-left: 4px solid var(--brd-long); }
+        .macro-item.m-strength { border-left: 4px solid var(--brd-strength); }
+
+        .macro-item span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .macro-item strong {
+            font-size: 1.3rem;
+            color: #fff;
+        }
+
+        /* Modal Structure Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(4, 6, 10, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 1.75rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-overlay.is-active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-muted);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            background: #0f172a;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        /* Specialized Split Input Box Styling */
+        .split-mileage-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--border-color);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        #print-capture-zone {
+            display: none;
+        }
+
+        /* Portrait Print Stylesheet overrides */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 8mm 8mm; 
+            }
+
+            html, body {
+                height: auto !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+
+            body * {
+                visibility: hidden;
+            }
+
+            #print-capture-zone, #print-capture-zone * {
+                visibility: visible !important;
+            }
+
+            #print-capture-zone {
+                display: flex !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                flex-direction: column !important;
+                gap: 10px !important;
+                background: #ffffff !important;
+            }
+
+            .print-header {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: 1px solid #cbd5e1 !important;
+                padding: 12px 16px !important;
+                border-radius: 8px !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+
+            .print-title {
+                color: #0f172a !important;
+                font-size: 1.4rem !important;
+                font-weight: 700;
+            }
+
+            .print-subtitle {
+                color: #475569 !important;
+                font-size: 0.85rem !important;
+            }
+
+            .print-stat-box {
+                border: 1px solid #cbd5e1 !important;
+                padding: 4px 12px !important;
+                text-align: center;
+                background: #f8fafc !important;
+                border-radius: 4px;
+            }
+
+            .print-stat-box span {
+                font-size: 0.65rem !important;
+                color: #64748b !important;
+                text-transform: uppercase;
+                display: block;
+            }
+            .print-stat-box strong {
+                font-size: 1rem !important;
+                color: #0f172a !important;
+            }
+
+            .print-page {
+                page-break-after: always !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+                width: 100% !important;
+                height: 260mm !important; 
+                box-sizing: border-box !important;
+            }
+            
+            .print-page:last-child {
+                page-break-after: avoid !important;
+            }
+
+            .print-week-strip {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 6px !important;
+                flex-grow: 1 !important;
+            }
+
+            .print-day-row {
+                background: #ffffff !important;
+                border: 1px solid #94a3b8 !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: stretch !important;
+                border-radius: 6px !important;
+                min-height: 0 !important;
+                flex: 1 1 0% !important;
+            }
+
+            .print-day-label-block {
+                background: #f1f5f9 !important;
+                border-right: 1px solid #cbd5e1 !important;
+                padding: 6px !important;
+                min-width: 120px !important;
+                max-width: 120px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                border-radius: 6px 0 0 6px !important;
+            }
+
+            .print-day-name {
+                color: #000000 !important;
+                font-size: 0.9rem !important;
+                font-weight: 700;
+            }
+
+            .print-day-date {
+                color: #475569 !important;
+                font-size: 0.75rem !important;
+            }
+
+            .print-workout-flex-wrapper {
+                padding: 6px 12px !important;
+                gap: 6px !important;
+                display: flex !important;
+                flex-direction: row !important; 
+                flex-wrap: wrap !important;
+                align-items: center !important;
+                align-content: center !important;
+                flex-grow: 1 !important;
+            }
+
+            .print-workout-bubble {
+                border: 1px solid #cbd5e1 !important;
+                padding: 6px 10px !important;
+                background: #f8fafc !important;
+                color: #0f172a !important;
+                border-radius: 6px !important;
+                flex: 1 1 auto !important;
+            }
+
+            .p-type-easy { border-left: 4px solid #22c55e !important; }
+            .p-type-intervals { border-left: 4px solid #ef4444 !important; }
+            .p-type-long { border-left: 4px solid #3b82f6 !important; }
+            .p-type-strength { border-left: 4px solid #eab308 !important; }
+            .p-type-rest { border-left: 4px solid #64748b !important; }
+
+            .p-meta {
+                font-size: 0.65rem !important;
+                color: #64748b !important;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .p-metrics {
+                font-size: 0.9rem !important;
+                color: #000000 !important;
+                font-weight: bold;
+            }
+
+            .p-splits {
+                font-size: 0.7rem !important;
+                color: #475569 !important;
+                font-style: italic;
+            }
+
+            .p-notes {
+                font-size: 0.75rem !important;
+                color: #334155 !important;
+            }
+
+            .container, .modal-overlay {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- Top Dashboard Header -->
+    <header>
+        <div class="header-left">
+            <div class="editable-title" id="app-title" contenteditable="true" spellcheck="false">Lorenzo's Workouts</div>
+            <br>
+            <div class="editable-subtitle" id="app-subtitle" contenteditable="true" spellcheck="false">Click here to write what race you are preparing for...</div>
+        </div>
+
+        <!-- Center Navigation Component and PDF Trigger -->
+        <div class="calendar-center-block">
+            <div class="calendar-controls">
+                <div class="view-switcher">
+                    <button class="switch-btn active" id="view-week-btn">Week</button>
+                    <button class="switch-btn" id="view-month-btn">Month</button>
+                    <button class="switch-btn" id="view-stats-btn">Stats</button>
+                </div>
+                <button class="nav-btn" id="prev-btn">← Prev</button>
+                <div class="current-week-display" id="date-range-text">Loading Plan...</div>
+                <button class="nav-btn" id="next-btn">Next →</button>
+            </div>
+            <button class="pdf-btn" id="trigger-pdf-modal-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download PDF
+            </button>
+        </div>
+
+        <div class="stats-summary">
+            <div class="stat-box">
+                <span>Total Distance</span>
+                <strong id="stat-distance">0.0 mi</strong>
+            </div>
+            <div class="stat-box">
+                <span>Easy Miles</span>
+                <strong id="stat-easy-distance" style="color: #4ade80;">0.0 mi</strong>
+            </div>
+            <div class="stat-box">
+                <span>Hard Miles</span>
+                <strong id="stat-hard-distance" style="color: #f87171;">0.0 mi</strong>
+            </div>
+        </div>
+    </header>
+
+    <!-- Unified Calendar Grid Layout Board -->
+    <main id="calendar-board" class="view-week">
+        <!-- Inside contents managed dynamically by JavaScript logic -->
+    </main>
+</div>
+
+<!-- Form Modal Overlay -->
+<div class="modal-overlay" id="workout-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 id="modal-title-action" style="color: #fff;">Schedule Session</h2>
+                <p id="modal-title-date" style="font-size: 0.8rem; color: var(--text-muted);"></p>
+            </div>
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+        </div>
+        <form id="workout-form">
+            <input type="hidden" id="target-date-string">
+            <input type="hidden" id="editing-workout-id">
+            
+            <div class="form-group">
+                <label for="workout-type">Activity Type</label>
+                <select id="workout-type" required>
+                    <option value="easy">Easy Run</option>
+                    <option value="intervals">Intervals / Speed</option>
+                    <option value="long">Long Run</option>
+                    <option value="strength">Strength Training</option>
+                    <option value="rest">Rest Day</option>
+                </select>
+            </div>
+
+            <!-- Total Run Metrics Row -->
+            <div class="form-group grid-2col">
+                <div>
+                    <label for="workout-distance" id="distance-main-label">Total Distance (mi)</label>
+                    <input type="number" id="workout-distance" step="0.1" min="0" placeholder="0.0">
+                </div>
+                <div>
+                    <label for="workout-duration">Duration (min)</label>
+                    <input type="number" id="workout-duration" min="0" placeholder="0">
+                </div>
+            </div>
+
+            <!-- Advanced Split Mileage Container -->
+            <div id="split-mileage-section" class="split-mileage-box" style="display: none;">
+                <label style="color: #60a5fa; margin-bottom: 0.5rem;">Optionally break down easy/hard splits:</label>
+                <div class="grid-2col">
+                    <div>
+                        <label for="workout-easy-distance">Easy Mileage (mi)</label>
+                        <input type="number" id="workout-easy-distance" step="0.1" min="0" placeholder="0.0">
+                    </div>
+                    <div>
+                        <label for="workout-hard-distance">Hard Mileage (mi)</label>
+                        <input type="number" id="workout-hard-distance" step="0.1" min="0" placeholder="0.0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="workout-notes">Notes / Targets</label>
+                <textarea id="workout-notes" rows="3" placeholder="Pace strategy, specific intervals, or path notes..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submit-form-btn">Schedule Session</button>
+        </form>
+    </div>
+</div>
+
+<!-- PDF Settings Selector Prompt Modal Overlay -->
+<div class="modal-overlay" id="pdf-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <h2 style="color: #fff;">Export PDF Settings</h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Choose your layout targets</p>
+            </div>
+            <button class="close-modal" id="close-pdf-modal-btn">&times;</button>
+        </div>
+        
+        <div class="form-group">
+            <label for="pdf-scope-select">Export Strategy</label>
+            <select id="pdf-scope-select">
+                <option value="current">Current View Range</option>
+                <option value="select-week">Specific Custom Week</option>
+                <option value="select-month">Specific Custom Month</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="pdf-week-picker-wrapper" style="display: none;">
+            <label for="pdf-week-input">Select Week (Choose any day inside target week)</label>
+            <input type="date" id="pdf-week-input">
+        </div>
+
+        <div class="form-group" id="pdf-month-picker-wrapper" style="display: none;">
+            <label for="pdf-month-input">Select Month</label>
+            <input type="month" id="pdf-month-input">
+        </div>
+
+        <button class="submit-btn" id="execute-print-btn" style="background-color: #10b981;">Generate Printable PDF</button>
+    </div>
+</div>
+
+<div id="print-capture-zone"></div>
+
+<script>
+    let currentMode = 'week'; // Modes available: 'week' | 'month' | 'stats'
+    let anchorDate = new Date(); 
+    let workouts = JSON.parse(localStorage.getItem('datedWeeklyWorkouts')) || [];
+
+    // Global chart instances to cleanly reset canvas streams
+    let chartDonutInstance = null;
+    let chartBarInstance = null; // Reused for the multi-line progression chart
+
+    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    const calendarBoard = document.getElementById('calendar-board');
+    const dateRangeText = document.getElementById('date-range-text');
+    const modal = document.getElementById('workout-modal');
+    const closeFormBtn = document.getElementById('close-modal-btn');
+    const workoutForm = document.getElementById('workout-form');
+    const appTitle = document.getElementById('app-title');
+    const appSubtitle = document.getElementById('app-subtitle');
+
+    const workoutTypeSelect = document.getElementById('workout-type');
+    const splitMileageSection = document.getElementById('split-mileage-section');
+    const distanceMainLabel = document.getElementById('distance-main-label');
+
+    const pdfModal = document.getElementById('pdf-modal');
+    const closePdfModalBtn = document.getElementById('close-pdf-modal-btn');
+    const triggerPdfModalBtn = document.getElementById('trigger-pdf-modal-btn');
+    const pdfScopeSelect = document.getElementById('pdf-scope-select');
+    const pdfWeekPickerWrapper = document.getElementById('pdf-week-picker-wrapper');
+    const pdfMonthPickerWrapper = document.getElementById('pdf-month-picker-wrapper');
+    const executePrintBtn = document.getElementById('execute-print-btn');
+    const printCaptureZone = document.getElementById('print-capture-zone');
+
+    workoutTypeSelect.addEventListener('change', () => {
+        handleTypeFieldToggling(workoutTypeSelect.value);
+    });
+
+    function handleTypeFieldToggling(selectedType) {
+        if (selectedType === 'intervals' || selectedType === 'long') {
+            splitMileageSection.style.display = 'block';
+            distanceMainLabel.innerText = 'Total Distance (mi)';
+        } else {
+            splitMileageSection.style.display = 'none';
+            distanceMainLabel.innerText = 'Distance (mi)';
+            document.getElementById('workout-easy-distance').value = '';
+            document.getElementById('workout-hard-distance').value = '';
+        }
+    }
+
+    // View Switcher Setup
+    const viewWeekBtn = document.getElementById('view-week-btn');
+    const viewMonthBtn = document.getElementById('view-month-btn');
+    const viewStatsBtn = document.getElementById('view-stats-btn');
+
+    viewWeekBtn.addEventListener('click', () => { changeViewMode('week', viewWeekBtn); });
+    viewMonthBtn.addEventListener('click', () => { changeViewMode('month', viewMonthBtn); });
+    viewStatsBtn.addEventListener('click', () => { changeViewMode('stats', viewStatsBtn); });
+
+    function changeViewMode(targetMode, targetBtn) {
+        if(currentMode === targetMode) return;
+        currentMode = targetMode;
+        
+        [viewWeekBtn, viewMonthBtn, viewStatsBtn].forEach(btn => btn.classList.remove('active'));
+        targetBtn.classList.add('active');
+        
+        calendarBoard.className = `view-${targetMode}`;
+        renderCalendar();
+    }
+
+    if(localStorage.getItem('appPlannerTitle')) {
+        appTitle.innerText = localStorage.getItem('appPlannerTitle');
+    }
+    if(localStorage.getItem('appPlannerSubtitle')) {
+        appSubtitle.innerText = localStorage.getItem('appPlannerSubtitle');
+    }
+
+    function saveTitle() {
+        let text = appTitle.innerText.trim();
+        if(text === "") { text = "Lorenzo's Workouts"; appTitle.innerText = text; }
+        localStorage.setItem('appPlannerTitle', text);
+    }
+
+    function saveSubtitle() {
+        let text = appSubtitle.innerText.trim();
+        if(text === "") { text = "Click here to write what race you are preparing for..."; appSubtitle.innerText = text; }
+        localStorage.setItem('appPlannerSubtitle', text);
+    }
+
+    appTitle.addEventListener('blur', saveTitle);
+    appTitle.addEventListener('keydown', (e) => { if(e.key === 'Enter') { e.preventDefault(); appTitle.blur(); } });
+    appSubtitle.addEventListener('blur', saveSubtitle);
+    appSubtitle.addEventListener('keydown', (e) => { if(e.key === 'Enter') { e.preventDefault(); appSubtitle.blur(); } });
+
+    // --- PDF / PRINT LOGIC ---
+    triggerPdfModalBtn.addEventListener('click', () => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('pdf-week-input').value = todayStr;
+        
+        const year = new Date().getFullYear();
+        const month = String(new Date().getMonth() + 1).padStart(2,'0');
+        document.getElementById('pdf-month-input').value = `${year}-${month}`;
+        
+        pdfScopeSelect.value = 'current';
+        pdfWeekPickerWrapper.style.display = 'none';
+        pdfMonthPickerWrapper.style.display = 'none';
+        pdfModal.classList.add('is-active');
+    });
+
+    closePdfModalBtn.addEventListener('click', () => pdfModal.classList.remove('is-active'));
+
+    pdfScopeSelect.addEventListener('change', () => {
+        const val = pdfScopeSelect.value;
+        pdfWeekPickerWrapper.style.display = (val === 'select-week') ? 'block' : 'none';
+        pdfMonthPickerWrapper.style.display = (val === 'select-month') ? 'block' : 'none';
+    });
+
+    executePrintBtn.addEventListener('click', () => {
+        buildPrintCaptureDOM();
+        pdfModal.classList.remove('is-active');
+        window.print();
+    });
+
+    function buildPrintCaptureDOM() {
+        printCaptureZone.innerHTML = '';
+        const targetStrategy = pdfScopeSelect.value;
+        let blocksToPrint = []; 
+        let printScopeTitle = "";
+
+        if (targetStrategy === 'current') {
+            if (currentMode === 'week') {
+                const currentMonday = getMondayOfWeek(anchorDate);
+                const days = [];
+                for(let i=0; i<7; i++){
+                    let d = new Date(currentMonday); d.setDate(currentMonday.getDate()+i);
+                    days.push(d);
+                }
+                blocksToPrint.push(days);
+                printScopeTitle = "Weekly Schedule: " + dateRangeText.innerText;
+            } else {
+                const year = anchorDate.getFullYear();
+                const month = anchorDate.getMonth();
+                blocksToPrint = breakMonthIntoWeeks(year, month);
+                printScopeTitle = "Monthly Schedule: " + anchorDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            }
+        } else if (targetStrategy === 'select-week') {
+            const rawVal = document.getElementById('pdf-week-input').value;
+            if(!rawVal) return;
+            const parts = rawVal.split('-');
+            const chosenDate = new Date(parts[0], parts[1]-1, parts[2]);
+            const selectedMonday = getMondayOfWeek(chosenDate);
+            const days = [];
+            for(let i=0; i<7; i++){
+                let d = new Date(selectedMonday); d.setDate(selectedMonday.getDate()+i);
+                days.push(d);
+            }
+            blocksToPrint.push(days);
+            printScopeTitle = `Weekly Schedule: Run Week of ${selectedMonday.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}`;
+        } else if (targetStrategy === 'select-month') {
+            const rawVal = document.getElementById('pdf-month-input').value; 
+            if(!rawVal) return;
+            const parts = rawVal.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            blocksToPrint = breakMonthIntoWeeks(year, month);
+            
+            let tempD = new Date(year, month, 1);
+            printScopeTitle = "Monthly Schedule: " + tempD.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        blocksToPrint.forEach((weekDaysArray, pageIndex) => {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'print-page';
+
+            let pageDistance = 0, pageEasy = 0, pageHard = 0;
+            const stringKeys = weekDaysArray.map(d => formatDateKey(d));
+            
+            workouts.forEach(w => {
+                if(stringKeys.includes(w.date)) {
+                    pageDistance += w.distance;
+                    if(w.type === 'easy') pageEasy += w.distance;
+                    else if(w.type === 'intervals' || w.type === 'long') {
+                        if(w.easyDistance > 0 || w.hardDistance > 0) {
+                            pageEasy += w.easyDistance; pageHard += w.hardDistance;
+                        } else {
+                            if(w.type === 'intervals') pageHard += w.distance;
+                            if(w.type === 'long') pageEasy += w.distance;
+                        }
+                    }
+                }
+            });
+
+            let headerHTML = `
+                <div class="print-header">
+                    <div>
+                        <div class="print-title">${appTitle.innerText}</div>
+                        <div class="print-subtitle">${printScopeTitle} ${blocksToPrint.length > 1 ? `(Page ${pageIndex+1} of ${blocksToPrint.length})` : ''}</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <div class="print-stat-box"><span>Total</span><strong>${pageDistance.toFixed(1)}m</strong></div>
+                        <div class="print-stat-box"><span>Easy</span><strong>${pageEasy.toFixed(1)}m</strong></div>
+                        <div class="print-stat-box"><span>Hard</span><strong>${pageHard.toFixed(1)}m</strong></div>
+                    </div>
+                </div>
+            `;
+
+            let stripHTML = `<div class="print-week-strip">`;
+            weekDaysArray.forEach(dayDate => {
+                const dateKey = formatDateKey(dayDate);
+                const dayName = weekdays[(dayDate.getDay() + 6) % 7];
+                const dayWorkouts = workouts.filter(w => w.date === dateKey);
+
+                let workoutsHTML = '';
+                dayWorkouts.forEach(wk => {
+                    let splitString = (wk.easyDistance > 0 || wk.hardDistance > 0) ? `<div class="p-splits">(${wk.easyDistance}E / ${wk.hardDistance}H)</div>` : '';
+                    workoutsHTML += `
+                        <div class="print-workout-bubble p-type-${wk.type}">
+                            <div class="p-meta">${wk.type}</div>
+                            <div class="p-metrics">${wk.distance > 0 ? `${wk.distance} mi` : ''} ${wk.distance > 0 && wk.duration > 0 ? '•':''} ${wk.duration > 0 ? `${wk.duration}m`:''}</div>
+                            ${splitString}
+                            ${wk.notes ? `<div class="p-notes">${wk.notes}</div>` : ''}
+                        </div>
+                    `;
+                });
+
+                stripHTML += `
+                    <div class="print-day-row">
+                        <div class="print-day-label-block">
+                            <span class="print-day-name">${dayName}</span>
+                            <span class="print-day-date">${dayDate.toLocaleDateString('en-US', {month:'short', day:'numeric'})}</span>
+                        </div>
+                        <div class="print-workout-flex-wrapper">
+                            ${workoutsHTML || '<span style="color:#94a3b8; font-size:0.8rem; font-style:italic;">Rest / No Session Scheduled</span>'}
+                        </div>
+                    </div>
+                `;
+            });
+            stripHTML += `</div>`;
+
+            pageDiv.innerHTML = headerHTML + stripHTML;
+            printCaptureZone.appendChild(pageDiv);
+        });
+    }
+
+    function breakMonthIntoWeeks(year, month) {
+        const structuralMatrixArr = [];
+        const firstDay = new Date(year, month, 1);
+        
+        let startOffset = firstDay.getDay(); 
+        startOffset = startOffset === 0 ? 6 : startOffset - 1; 
+        
+        const workingCursorDate = new Date(year, month, 1 - startOffset);
+        
+        for (let row = 0; row < 6; row++) {
+            let weekDays = [];
+            let hasDaysInTargetMonth = false;
+            
+            for (let d = 0; d < 7; d++) {
+                let lookupDay = new Date(workingCursorDate);
+                if(lookupDay.getMonth() === month) {
+                    hasDaysInTargetMonth = true;
+                }
+                weekDays.push(lookupDay);
+                workingCursorDate.setDate(workingCursorDate.getDate() + 1);
+            }
+            
+            if (hasDaysInTargetMonth) {
+                structuralMatrixArr.push(weekDays);
+            }
+        }
+        return structuralMatrixArr;
+    }
+
+    // Calendar Math Helpers
+    function getMondayOfWeek(d) {
+        const date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); 
+        return new Date(date.setDate(diff));
+    }
+
+    function formatDateKey(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function displayDateString(date) {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // Dynamic Render Engine
+    function renderCalendar() {
+        calendarBoard.innerHTML = '';
+
+        if (currentMode === 'stats') {
+            dateRangeText.innerText = anchorDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) + " Analytics";
+            renderMonthlyAnalyticsDashboard();
+            updateStatsSummary();
+            return;
+        }
+
+        const generatedGridDays = [];
+
+        if (currentMode === 'week') {
+            const currentMonday = getMondayOfWeek(anchorDate);
+            for (let i = 0; i < 7; i++) {
+                const nextDay = new Date(currentMonday);
+                nextDay.setDate(currentMonday.getDate() + i);
+                generatedGridDays.push({ date: nextDay, isOutOfBounds: false });
+            }
+            dateRangeText.innerText = `${displayDateString(generatedGridDays[0].date)} - ${displayDateString(generatedGridDays[6].date)}`;
+
+        } else if (currentMode === 'month') {
+            const year = anchorDate.getFullYear();
+            const month = anchorDate.getMonth();
+            
+            dateRangeText.innerText = anchorDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            let startOffset = firstDayOfMonth.getDay(); 
+            startOffset = startOffset === 0 ? 6 : startOffset - 1; 
+
+            const totalGridCellsNeeded = 42; 
+            const executionDate = new Date(year, month, 1 - startOffset);
+
+            for (let i = 0; i < totalGridCellsNeeded; i++) {
+                const loopDayInstance = new Date(executionDate);
+                generatedGridDays.push({
+                    date: loopDayInstance,
+                    isOutOfBounds: loopDayInstance.getMonth() !== month
+                });
+                executionDate.setDate(executionDate.getDate() + 1);
+            }
+        }
+
+        generatedGridDays.forEach((dayData) => {
+            const dateStringKey = formatDateKey(dayData.date);
+            const indexDayOfWeek = (dayData.date.getDay() + 6) % 7;
+            const dayNameLabel = weekdays[indexDayOfWeek];
+
+            const dayCard = document.createElement('div');
+            dayCard.className = `day-card ${dayData.isOutOfBounds ? 'out-of-bounds' : ''}`;
+            dayCard.setAttribute('data-date', dateStringKey);
+            
+            dayCard.innerHTML = `
+                <div class="day-header">
+                    <span class="day-name">${dayNameLabel}</span>
+                    <span class="day-date">${dayData.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                </div>
+                <div class="workout-list"></div>
+                <div class="add-hint">+ Add Session</div>
+            `;
+
+            dayCard.addEventListener('click', (e) => {
+                if (e.target.closest('.workout-item')) return;
+                openWorkoutModal(dayNameLabel, dayData.date);
+            });
+
+            calendarBoard.appendChild(dayCard);
+        });
+
+        renderWorkoutsToSlots();
+        updateStatsSummary();
+    }
+
+    // --- ANALYTICS DASHBOARD INJECTION ENGINE ---
+    function renderMonthlyAnalyticsDashboard() {
+        const year = anchorDate.getFullYear();
+        const month = anchorDate.getMonth();
+        const weekBlocks = breakMonthIntoWeeks(year, month);
+
+        let totalEasy = 0;
+        let totalHard = 0;
+        let catEasyVol = 0, catIntervalsVol = 0, catLongVol = 0, catStrengthCount = 0;
+
+        const monthlyWeekLabels = [];
+        const monthlyWeeklyTotalVolumes = [];
+        const monthlyWeeklyEasyVolumes = [];
+        const monthlyWeeklyHardVolumes = [];
+
+        weekBlocks.forEach((week, index) => {
+            let weekTotalVolume = 0;
+            let weekEasyVolume = 0;
+            let weekHardVolume = 0;
+            
+            const stringKeys = week.map(d => formatDateKey(d));
+            
+            workouts.forEach(w => {
+                if(stringKeys.includes(w.date)) {
+                    weekTotalVolume += w.distance;
+                    
+                    // Accumulate raw metric categorization types
+                    if(w.type === 'easy') {
+                        totalEasy += w.distance; 
+                        catEasyVol += w.distance;
+                        weekEasyVolume += w.distance;
+                    } else if(w.type === 'intervals') {
+                        catIntervalsVol += w.distance;
+                    } else if(w.type === 'long') {
+                        catLongVol += w.distance;
+                    } else if(w.type === 'strength') {
+                        catStrengthCount++;
+                    }
+
+                    // Process dynamic sub-split engine layers
+                    if(w.type === 'intervals' || w.type === 'long') {
+                        if(w.easyDistance > 0 || w.hardDistance > 0) {
+                            totalEasy += w.easyDistance;
+                            totalHard += w.hardDistance;
+                            weekEasyVolume += w.easyDistance;
+                            weekHardVolume += w.hardDistance;
+                        } else {
+                            if(w.type === 'intervals') {
+                                totalHard += w.distance;
+                                weekHardVolume += w.distance;
+                            }
+                            if(w.type === 'long') {
+                                totalEasy += w.distance;
+                                weekEasyVolume += w.distance;
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Only add data points if the week has more than 0 miles total
+            if (weekTotalVolume > 0) {
+                const startText = week[0].toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                monthlyWeekLabels.push(`Wk ${index+1} (${startText})`);
+                monthlyWeeklyTotalVolumes.push(parseFloat(weekTotalVolume.toFixed(1)));
+                monthlyWeeklyEasyVolumes.push(parseFloat(weekEasyVolume.toFixed(1)));
+                monthlyWeeklyHardVolumes.push(parseFloat(weekHardVolume.toFixed(1)));
+            }
+        });
+
+        // Inject analytical component frames directly inside board wrapper
+        calendarBoard.innerHTML = `
+            <div class="analytics-container">
+                <!-- Left Hand Side: Aerobic Distribution Donut -->
+                <div class="analytics-card">
+                    <h3>Engine Breakdown (Easy vs Hard)</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-donut-distribution"></canvas>
+                    </div>
+                    <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                        Aerobic base work vs high intensity balance comparison.
+                    </div>
+                </div>
+
+                <!-- Right Hand Side: Block Progression Line Chart -->
+                <div class="analytics-card">
+                    <h3>Weekly Loading Progression</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="chart-line-progression"></canvas>
+                    </div>
+                    
+                    <!-- Micro Stats Cards Matrix Row -->
+                    <div class="macro-grid">
+                        <div class="macro-item m-easy"><span>Easy Runs</span><strong>${catEasyVol.toFixed(1)}m</strong></div>
+                        <div class="macro-item m-intervals"><span>Speed Sets</span><strong>${catIntervalsVol.toFixed(1)}m</strong></div>
+                        <div class="macro-item m-long"><span>Long Endurance</span><strong>${catLongVol.toFixed(1)}m</strong></div>
+                        <div class="macro-item m-strength"><span>Strength Work</span><strong>${catStrengthCount} Blocks</strong></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Render Donut Chart
+        const ctxDonut = document.getElementById('chart-donut-distribution').getContext('2d');
+        if(chartDonutInstance) chartDonutInstance.destroy();
+        
+        if (totalEasy === 0 && totalHard === 0) {
+            chartDonutInstance = new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['No Data Found'],
+                    datasets: [{ data: [1], backgroundColor: ['#334155'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: '#94a3b8' } } } }
+            });
+        } else {
+            const combinedTotal = totalEasy + totalHard;
+            const easyPercent = ((totalEasy / combinedTotal) * 100).toFixed(1);
+            const hardPercent = ((totalHard / combinedTotal) * 100).toFixed(1);
+
+            chartDonutInstance = new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: [`Easy Aerobic (${easyPercent}%)`, `Hard Intensity (${hardPercent}%)`],
+                    datasets: [{
+                        data: [totalEasy.toFixed(1), totalHard.toFixed(1)],
+                        backgroundColor: ['#4ade80', '#f87171'],
+                        borderColor: '#1e293b',
+                        borderWidth: 2,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#f8fafc', font: { weight: 'bold', size: 12 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.parsed || 0;
+                                    return ` ${value} mi`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render Multi-Line Progression Chart
+        const ctxLine = document.getElementById('chart-line-progression').getContext('2d');
+        if(chartBarInstance) chartBarInstance.destroy();
+
+        chartBarInstance = new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: monthlyWeekLabels,
+                datasets: [
+                    {
+                        label: 'Total Mileage',
+                        data: monthlyWeeklyTotalVolumes,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#3b82f6',
+                        pointRadius: 4,
+                        tension: 0.15,
+                        fill: false
+                    },
+                    {
+                        label: 'Easy Miles',
+                        data: monthlyWeeklyEasyVolumes,
+                        borderColor: '#4ade80',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#4ade80',
+                        pointRadius: 3,
+                        borderDash: [4, 4],
+                        tension: 0.15
+                    },
+                    {
+                        label: 'Hard Miles',
+                        data: monthlyWeeklyHardVolumes,
+                        borderColor: '#f87171',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#f87171',
+                        pointRadius: 3,
+                        borderDash: [2, 2],
+                        tension: 0.15
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        display: true,
+                        position: 'top',
+                        labels: { color: '#f8fafc', font: { weight: '600' } }
+                    } 
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(51, 65, 85, 0.5)' },
+                        ticks: { color: '#94a3b8', font: { weight: '600' } },
+                        title: { display: true, text: 'Distance (mi)', color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#f8fafc', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderWorkoutsToSlots() {
+        document.querySelectorAll('.workout-list').forEach(list => list.innerHTML = '');
+
+        workouts.forEach(workout => {
+            const listTarget = document.querySelector(`.day-card[data-date="${workout.date}"] .workout-list`);
+            if (!listTarget) return; 
+
+            const itemCard = document.createElement('div');
+            itemCard.className = `workout-item type-${workout.type}`;
+            const typeLabel = workout.type.charAt(0).toUpperCase() + workout.type.slice(1);
+
+            let splitTextHTML = '';
+            if ((workout.type === 'intervals' || workout.type === 'long') && (workout.easyDistance > 0 || workout.hardDistance > 0)) {
+                splitTextHTML = `<div class="workout-splits-hint">(${workout.easyDistance || 0}E / ${workout.hardDistance || 0}H)</div>`;
+            }
+
+            itemCard.innerHTML = `
+                <div class="workout-top">
+                    <span>${typeLabel}</span>
+                </div>
+                <div class="workout-metrics">
+                    ${workout.distance > 0 ? `${workout.distance} mi` : ''} 
+                    ${workout.distance > 0 && workout.duration > 0 ? '•' : ''} 
+                    ${workout.duration > 0 ? `${workout.duration}m` : ''}
+                    ${workout.distance == 0 && workout.duration == 0 ? 'Active Session' : ''}
+                </div>
+                ${splitTextHTML}
+                ${workout.notes ? `<div class="workout-notes">${workout.notes}</div>` : ''}
+                <div class="workout-actions">
+                    <div class="action-buttons-group">
+                        <button class="action-inline-btn edit-btn" onclick="event.stopPropagation(); startEditWorkout('${workout.id}')">Edit</button>
+                        <button class="action-inline-btn delete-btn" onclick="event.stopPropagation(); deleteWorkout('${workout.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
+            listTarget.appendChild(itemCard);
+        });
+    }
+
+    function openWorkoutModal(dayName, dateObj) {
+        document.getElementById('modal-title-action').innerText = `Schedule ${dayName}`;
+        document.getElementById('modal-title-date').innerText = displayDateString(dateObj);
+        document.getElementById('target-date-string').value = formatDateKey(dateObj);
+        document.getElementById('editing-workout-id').value = '';
+        document.getElementById('submit-form-btn').innerText = 'Schedule Session';
+        
+        handleTypeFieldToggling('easy');
+        modal.classList.add('is-active');
+    }
+
+    window.startEditWorkout = function(id) {
+        const workout = workouts.find(w => w.id === id);
+        if (!workout) return;
+
+        const parts = workout.date.split('-');
+        const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        document.getElementById('modal-title-action').innerText = `Edit Session`;
+        document.getElementById('modal-title-date').innerText = displayDateString(dateObj);
+        document.getElementById('target-date-string').value = workout.date;
+        document.getElementById('editing-workout-id').value = workout.id;
+        
+        document.getElementById('workout-type').value = workout.type;
+        document.getElementById('workout-distance').value = workout.distance > 0 ? workout.distance : '';
+        document.getElementById('workout-duration').value = workout.duration > 0 ? workout.duration : '';
+        document.getElementById('workout-notes').value = workout.notes;
+        
+        handleTypeFieldToggling(workout.type);
+        document.getElementById('workout-easy-distance').value = workout.easyDistance > 0 ? workout.easyDistance : '';
+        document.getElementById('workout-hard-distance').value = workout.hardDistance > 0 ? workout.hardDistance : '';
+
+        document.getElementById('submit-form-btn').innerText = 'Save Changes';
+        modal.classList.add('is-active');
+    }
+
+    function closeModal() {
+        modal.classList.remove('is-active');
+        workoutForm.reset();
+    }
+
+    closeFormBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+    workoutForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const dateKey = document.getElementById('target-date-string').value;
+        const editingId = document.getElementById('editing-workout-id').value;
+        const type = document.getElementById('workout-type').value;
+        const duration = parseInt(document.getElementById('workout-duration').value) || 0;
+        const notes = document.getElementById('workout-notes').value.trim();
+
+        let easyDistance = 0;
+        let hardDistance = 0;
+        let distance = parseFloat(document.getElementById('workout-distance').value) || 0;
+
+        if (type === 'intervals' || type === 'long') {
+            easyDistance = parseFloat(document.getElementById('workout-easy-distance').value) || 0;
+            hardDistance = parseFloat(document.getElementById('workout-hard-distance').value) || 0;
+            if (distance === 0 && (easyDistance > 0 || hardDistance > 0)) {
+                distance = easyDistance + hardDistance;
+            }
+        }
+
+        if (editingId) {
+            workouts = workouts.map(w => w.id === editingId ? {
+                ...w, type, distance, duration, easyDistance, hardDistance, notes
+            } : w);
+        } else {
+            workouts.push({
+                id: Date.now().toString(),
+                date: dateKey, type, distance, duration, easyDistance, hardDistance, notes
+            });
+        }
+
+        saveState();
+        closeModal();
+        renderCalendar();
+    });
+
+    window.deleteWorkout = function(id) {
+        workouts = workouts.filter(w => w.id !== id);
+        saveState();
+        renderCalendar();
+    }
+
+    function saveState() {
+        localStorage.setItem('datedWeeklyWorkouts', JSON.stringify(workouts));
+    }
+
+    function updateStatsSummary() {
+        let totalMiles = 0;
+        let easyMilesSum = 0;
+        let hardMilesSum = 0;
+
+        let activeLayoutDates = [];
+
+        if(currentMode === 'stats' || currentMode === 'month') {
+            // Target all calendar slots within month macro frame bounds
+            const year = anchorDate.getFullYear();
+            const month = anchorDate.getMonth();
+            const fullWeeks = breakMonthIntoWeeks(year, month);
+            fullWeeks.forEach(wk => {
+                wk.forEach(day => {
+                    if(day.getMonth() === month) activeLayoutDates.push(formatDateKey(day));
+                });
+            });
+        } else {
+            activeLayoutDates = Array.from(document.querySelectorAll('.day-card:not(.out-of-bounds)')).map(card => card.getAttribute('data-date'));
+        }
+
+        workouts.forEach(w => {
+            if (activeLayoutDates.includes(w.date)) {
+                totalMiles += w.distance;
+
+                if (w.type === 'easy') {
+                    easyMilesSum += w.distance;
+                } else if (w.type === 'intervals' || w.type === 'long') {
+                    if (w.easyDistance > 0 || w.hardDistance > 0) {
+                        easyMilesSum += (w.easyDistance || 0);
+                        hardMilesSum += (w.hardDistance || 0);
+                    } else {
+                        if (w.type === 'intervals') hardMilesSum += w.distance;
+                        if (w.type === 'long') easyMilesSum += w.distance;
+                    }
+                }
+            }
+        });
+
+        document.getElementById('stat-distance').innerText = `${totalMiles.toFixed(1)} mi`;
+        document.getElementById('stat-easy-distance').innerText = `${easyMilesSum.toFixed(1)} mi`;
+        document.getElementById('stat-hard-distance').innerText = `${hardMilesSum.toFixed(1)} mi`;
+    }
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        if(currentMode === 'week') {
+            anchorDate.setDate(anchorDate.getDate() - 7);
+        } else {
+            anchorDate.setMonth(anchorDate.getMonth() - 1);
+        }
+        renderCalendar();
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        if(currentMode === 'week') {
+            anchorDate.setDate(anchorDate.getDate() + 7);
+        } else {
+            anchorDate.setMonth(anchorDate.getMonth() + 1);
+        }
+        renderCalendar();
+    });
+
+    renderCalendar();
+</script>
+</body>
+</html>
