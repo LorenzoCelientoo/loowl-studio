@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Training Planner - Dark Blue</title>
-    <!-- Chart.js CDN for clean rendering -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -639,6 +638,143 @@
             display: none;
         }
 
+        /* --- GLOBAL MOBILE LAYOUT RESPONSIVENESS OVERRIDES --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.25rem;
+                padding: 1rem;
+            }
+
+            .header-left {
+                text-align: center;
+                min-width: unset;
+            }
+
+            .editable-title {
+                font-size: 1.5rem;
+                min-width: unset;
+                width: 100%;
+            }
+
+            .editable-subtitle {
+                font-size: 0.85rem;
+                min-width: unset;
+                width: 100%;
+            }
+
+            .calendar-center-block {
+                width: 100%;
+            }
+
+            .calendar-controls {
+                display: grid !important;
+                grid-template-columns: auto 1fr auto;
+                gap: 0.75rem;
+                width: 100%;
+                padding: 0.6rem;
+            }
+
+            .view-switcher {
+                grid-column: 1 / -1;
+                display: flex;
+                width: 100%;
+            }
+
+            .switch-btn {
+                flex: 1;
+                text-align: center;
+                padding: 0.4rem 0.25rem;
+                font-size: 0.8rem;
+            }
+
+            #prev-btn {
+                grid-column: 1;
+            }
+
+            .current-week-display {
+                grid-column: 2;
+                min-width: unset;
+                align-self: center;
+                font-size: 0.8rem;
+            }
+
+            #next-btn {
+                grid-column: 3;
+            }
+
+            .pdf-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 0.6rem;
+            }
+
+            .stats-summary {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            .stat-box {
+                min-width: unset;
+                padding: 0.5rem 0.25rem;
+            }
+
+            .stat-box span {
+                font-size: 0.6rem;
+            }
+
+            .stat-box strong {
+                font-size: 0.95rem;
+            }
+
+            /* Shift cards from standard side grid to flexible stacked rows */
+            .day-card {
+                min-height: auto !important;
+            }
+
+            main.view-month .day-card {
+                min-height: auto !important;
+            }
+
+            .workout-list {
+                min-height: 40px;
+                padding: 0.5rem;
+            }
+
+            /* Make hints consistently readable without waiting for user hover gestures */
+            .add-hint {
+                opacity: 1 !important;
+                padding: 0.6rem;
+                background: rgba(255, 255, 255, 0.02);
+            }
+
+            .modal-content {
+                padding: 1.25rem;
+                margin: 0 0.75rem;
+                width: calc(100% - 1.5rem);
+            }
+
+            .grid-2col {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .workout-item {
+                padding: 0.6rem;
+            }
+
+            .workout-metrics {
+                font-size: 0.85rem;
+            }
+        }
+
         /* Portrait Print Stylesheet overrides */
         @media print {
             @page {
@@ -830,7 +966,6 @@
 
 <div class="container">
     
-    <!-- Top Dashboard Header -->
     <header>
         <div class="header-left">
             <div class="editable-title" id="app-title" contenteditable="true" spellcheck="false">Lorenzo's Workouts</div>
@@ -838,7 +973,6 @@
             <div class="editable-subtitle" id="app-subtitle" contenteditable="true" spellcheck="false">Click here to write what race you are preparing for...</div>
         </div>
 
-        <!-- Center Navigation Component and PDF Trigger -->
         <div class="calendar-center-block">
             <div class="calendar-controls">
                 <div class="view-switcher">
@@ -872,13 +1006,10 @@
         </div>
     </header>
 
-    <!-- Unified Calendar Grid Layout Board -->
     <main id="calendar-board" class="view-week">
-        <!-- Inside contents managed dynamically by JavaScript logic -->
-    </main>
+        </main>
 </div>
 
-<!-- Form Modal Overlay -->
 <div class="modal-overlay" id="workout-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -903,7 +1034,6 @@
                 </select>
             </div>
 
-            <!-- Total Run Metrics Row -->
             <div class="form-group grid-2col">
                 <div>
                     <label for="workout-distance" id="distance-main-label">Total Distance (mi)</label>
@@ -915,7 +1045,6 @@
                 </div>
             </div>
 
-            <!-- Advanced Split Mileage Container -->
             <div id="split-mileage-section" class="split-mileage-box" style="display: none;">
                 <label style="color: #60a5fa; margin-bottom: 0.5rem;">Optionally break down easy/hard splits:</label>
                 <div class="grid-2col">
@@ -940,7 +1069,6 @@
     </div>
 </div>
 
-<!-- PDF Settings Selector Prompt Modal Overlay -->
 <div class="modal-overlay" id="pdf-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -1414,7 +1542,6 @@
         // Inject analytical component frames directly inside board wrapper
         calendarBoard.innerHTML = `
             <div class="analytics-container">
-                <!-- Left Hand Side: Aerobic Distribution Donut -->
                 <div class="analytics-card">
                     <h3>Engine Breakdown (Easy vs Hard)</h3>
                     <div class="chart-wrapper">
@@ -1425,14 +1552,12 @@
                     </div>
                 </div>
 
-                <!-- Right Hand Side: Block Progression Line Chart -->
                 <div class="analytics-card">
                     <h3>Weekly Loading Progression</h3>
                     <div class="chart-wrapper">
                         <canvas id="chart-line-progression"></canvas>
                     </div>
                     
-                    <!-- Micro Stats Cards Matrix Row -->
                     <div class="macro-grid">
                         <div class="macro-item m-easy"><span>Easy Runs</span><strong>${catEasyVol.toFixed(1)}m</strong></div>
                         <div class="macro-item m-intervals"><span>Speed Sets</span><strong>${catIntervalsVol.toFixed(1)}m</strong></div>
