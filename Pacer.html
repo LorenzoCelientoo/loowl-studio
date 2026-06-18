@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacer</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+            --secondary: #64748b;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 2rem 1rem;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #047857;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            text-align: center;
+        }
+
+        /* Menu View Styles */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .btn-menu {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-menu:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #ecfdf5;
+            transform: translateY(-2px);
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .inline-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        /* Presets Grid */
+        .presets-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .btn-preset {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 0.45rem 0.25rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+
+        .btn-preset:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Utilities / Buttons */
+        button.btn-submit {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        button.btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.btn-back {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0;
+            font-size: 0.9rem;
+        }
+
+        button.btn-back:hover {
+            color: var(--text);
+            text-decoration: underline;
+        }
+
+        /* Output / Display Panels */
+        .results {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background: #f0fdf4;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .results p {
+            margin: 0.4rem 0;
+            font-size: 1.05rem;
+        }
+
+        .table-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .table-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .btn-export {
+            background: #ffffff;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .splits-container {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Native Print Layout configuration rules */
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+            }
+            .card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+            .btn-back, .btn-submit, .btn-export, .presets-title, .presets-grid, .form-group, h1 {
+                display: none !important;
+            }
+            .splits-container {
+                max-height: none !important;
+                overflow: visible !important;
+                border: none;
+            }
+            th {
+                position: static;
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .results {
+                border: 1px solid #ddd;
+                background: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #printable-area {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="main-title">Pacer</h1>
+
+    <!-- MAIN MENU -->
+    <div id="main-menu" class="card">
+        <h2>Select Calculation Track</h2>
+        <div class="menu-grid">
+            <button class="btn-menu" onclick="switchView('calc-time-view')">⏱️ Project Final Finish Time</button>
+            <button class="btn-menu" onclick="switchView('calc-pace-view')">🏃‍♂️ Find Required Target Pace</button>
+        </div>
+    </div>
+
+    <!-- VIEW 1: PROJECTED TIME -->
+    <div id="calc-time-view" class="card hidden">
+        <button class="btn-back" onclick="switchView('main-menu')">← Back to Menu</button>
+        <h2>Project Final Time</h2>
+        
+        <div class="presets-title">Quick Distance Presets</div>
+        <div class="presets-grid">
+            <button class="btn-preset" onclick="setPreset(1, 800, 'm')">800m</button>
+            <button class="btn-preset" onclick="setPreset(1, 1, 'km')">1k</button>
+            <button class="btn-preset" onclick="setPreset(1, 1500, 'm')">1500m</button>
+            <button class="btn-preset" onclick="setPreset(1, 1, 'mi')">1 Mile</button>
+            <button class="btn-preset" onclick="setPreset(1, 5, 'km')">5K</button>
+            <button class="btn-preset" onclick="setPreset(1, 10, 'km')">10K</button>
+            <button class="btn-preset" onclick="setPreset(1, 21.0975, 'km')">Half</button>
+            <button class="btn-preset" onclick="setPreset(1, 42.195, 'km')">Marathon</button>
+        </div>
+
+        <div class="form-group">
+            <label for="calc1-dist">Target Distance</label>
+            <div class="inline-inputs">
+                <input type="number" id="calc1-dist" step="0.001" placeholder="e.g., 5">
+                <select id="calc1-unit">
+                    <option value="km">Km</option>
+                    <option value="mi">Miles</option>
+                    <option value="m">Meters</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="calc1-pace-unit">Pace Context Reference</label>
+            <select id="calc1-pace-unit">
+                <option value="km">Minutes per Kilometer (/km)</option>
+                <option value="mi">Minutes per Mile (/mi)</option>
+                <option value="400m">Minutes per Track Lap (400m)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Target Entry Pace</label>
+            <div class="time-inputs">
+                <input type="number" id="calc1-pace-m" placeholder="Min" min="0">
+                <input type="number" id="calc1-pace-s" placeholder="Sec" min="0" max="59">
+            </div>
+        </div>
+        
+        <button class="btn-submit" onclick="calculateTime()">Calculate Projection</button>
+
+        <!-- Dynamic Output Box -->
+        <div id="calc1-output-block" class="hidden">
+            <div id="calc1-results" class="results"></div>
+            
+            <div class="table-header-actions">
+                <div class="table-title">Splits Sheet</div>
+                <button class="btn-export" onclick="window.print()">🖨️ Export / Print</button>
+            </div>
+            <div id="calc1-splits" class="splits-container"></div>
+        </div>
+    </div>
+
+    <!-- VIEW 2: REQUIRED PACE -->
+    <div id="calc-pace-view" class="card hidden">
+        <button class="btn-back" onclick="switchView('main-menu')">← Back to Menu</button>
+        <h2>Find Required Pace</h2>
+        
+        <div class="presets-title">Quick Distance Presets</div>
+        <div class="presets-grid">
+            <button class="btn-preset" onclick="setPreset(2, 800, 'm')">800m</button>
+            <button class="btn-preset" onclick="setPreset(2, 1, 'km')">1k</button>
+            <button class="btn-preset" onclick="setPreset(2, 1500, 'm')">1500m</button>
+            <button class="btn-preset" onclick="setPreset(2, 1, 'mi')">1 Mile</button>
+            <button class="btn-preset" onclick="setPreset(2, 5, 'km')">5K</button>
+            <button class="btn-preset" onclick="setPreset(2, 10, 'km')">10K</button>
+            <button class="btn-preset" onclick="setPreset(2, 21.0975, 'km')">Half</button>
+            <button class="btn-preset" onclick="setPreset(2, 42.195, 'km')">Marathon</button>
+        </div>
+
+        <div class="form-group">
+            <label for="calc2-dist">Target Distance</label>
+            <div class="inline-inputs">
+                <input type="number" id="calc2-dist" step="0.001" placeholder="e.g., 10">
+                <select id="calc2-unit">
+                    <option value="km">Km</option>
+                    <option value="mi">Miles</option>
+                    <option value="m">Meters</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Target Finish Time</label>
+            <div class="time-inputs">
+                <input type="number" id="calc2-time-h" placeholder="Hrs" min="0">
+                <input type="number" id="calc2-time-m" placeholder="Min" min="0" max="59">
+                <input type="number" id="calc2-time-s" placeholder="Sec" min="0" max="59">
+            </div>
+        </div>
+        
+        <button class="btn-submit" onclick="calculatePace()">Calculate Required Paces</button>
+
+        <!-- Dynamic Output Box -->
+        <div id="calc2-output-block" class="hidden">
+            <div id="calc2-results" class="results"></div>
+            
+            <div class="table-header-actions">
+                <div class="table-title">Splits Sheet</div>
+                <button class="btn-export" onclick="window.print()">🖨️ Export / Print</button>
+            </div>
+            <div id="calc2-splits" class="splits-container"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchView(viewId) {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('calc-time-view').classList.add('hidden');
+        document.getElementById('calc-pace-view').classList.add('hidden');
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    // Set presets helper
+    function setPreset(calcNum, value, unit) {
+        document.getElementById(`calc${calcNum}-dist`).value = value;
+        document.getElementById(`calc${calcNum}-unit`).value = unit;
+    }
+
+    // High precision milliseconds parsing time formatter
+    function formatTime(totalSeconds) {
+        if (isNaN(totalSeconds) || totalSeconds < 0) return "00:00";
+        
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        
+        // Isolate seconds and decimals for high accuracy tracking
+        let secs = totalSeconds % 60;
+        
+        const pad = (num) => String(num).padStart(2, '0');
+
+        if (hrs > 0) {
+            return `${hrs}:${pad(mins)}:${pad(Math.floor(secs))}`;
+        }
+        
+        // Show tenths of a second if metric has remaining float details (useful for short track work)
+        if (totalSeconds < 300) { 
+            return `${pad(mins)}:${secs.toFixed(1)}`;
+        }
+        
+        return `${pad(mins)}:${pad(Math.floor(secs))}`;
+    }
+
+    function convertToMeters(value, unit) {
+        if (unit === 'km') return value * 1000;
+        if (unit === 'mi') return value * 1609.344;
+        return value; 
+    }
+
+    // Core Splits Matrix Matrix Builder
+    function generateSplitsTable(totalMeters, totalSeconds) {
+        if (totalMeters <= 0 || totalSeconds <= 0) return '';
+        
+        const mPerSec = totalMeters / totalSeconds;
+        let html = '<table><thead><tr><th>Split Interval</th><th>Cumulative Time</th></tr></thead><tbody>';
+
+        // TRACK PROFILE MODE: Trigger if total distance under 1600 meters
+        if (totalMeters <= 1609.35) {
+            html += '<tr><th colspan="2" style="background:#e2e8f0; text-align:center; color:#047857;">Track Interval Splits</th></tr>';
+            
+            const intervals = [200, 400, 800];
+            intervals.forEach(intM => {
+                if (totalMeters >= intM) {
+                    let count = Math.floor(totalMeters / intM);
+                    for (let i = 1; i <= count; i++) {
+                        let currentM = i * intM;
+                        let currentSec = currentM / mPerSec;
+                        html += `<tr><td>${currentM}m</td><td><strong>${formatTime(currentSec)}</strong></td></tr>`;
+                    }
+                }
+            });
+            
+            // Catch exact final step
+            if (totalMeters % 200 !== 0 && totalMeters % 400 !== 0 && totalMeters % 800 !== 0) {
+                html += `<tr style="font-weight:bold; background:#f0fdf4;"><td>Final (${Math.round(totalMeters)}m)</td><td>${formatTime(totalSeconds)}</td></tr>`;
+            }
+
+        } else {
+            // LONG DISTANCE PROFILE MODE: Standard Kilometer and Mile Splits
+            html += '<tr><th colspan="2" style="background:#e2e8f0; text-align:center; color:#047857;">Kilometer Splits</th></tr>';
+            let kmCount = Math.floor(totalMeters / 1000);
+            for (let i = 1; i <= kmCount; i++) {
+                let currentM = i * 1000;
+                let currentSec = currentM / mPerSec;
+                html += `<tr><td>Km ${i}</td><td><strong>${formatTime(currentSec)}</strong></td></tr>`;
+            }
+            if (totalMeters % 1000 !== 0) {
+                 html += `<tr style="font-weight:bold; background:#f8fafc;"><td>Final (${(totalMeters/1000).toFixed(2)} km)</td><td>${formatTime(totalSeconds)}</td></tr>`;
+            }
+
+            html += '<tr><th colspan="2" style="background:#e2e8f0; text-align:center; color:#047857;">Mile Splits</th></tr>';
+            let mileMeters = 1609.344;
+            let mileCount = Math.floor(totalMeters / mileMeters);
+            for (let i = 1; i <= mileCount; i++) {
+                let currentM = i * mileMeters;
+                let currentSec = currentM / mPerSec;
+                html += `<tr><td>Mile ${i}</td><td><strong>${formatTime(currentSec)}</strong></td></tr>`;
+            }
+            if (totalMeters % mileMeters !== 0) {
+                html += `<tr style="font-weight:bold; background:#f8fafc;"><td>Final (${(totalMeters/mileMeters).toFixed(2)} mi)</td><td>${formatTime(totalSeconds)}</td></tr>`;
+            }
+        }
+
+        html += '</tbody></table>';
+        return html;
+    }
+
+    // --- TRACK 1: CALC TIME FROM PACE ---
+    function calculateTime() {
+        const distInput = parseFloat(document.getElementById('calc1-dist').value);
+        const distUnit = document.getElementById('calc1-unit').value;
+        const paceUnit = document.getElementById('calc1-pace-unit').value;
+        const paceM = parseInt(document.getElementById('calc1-pace-m').value) || 0;
+        const paceS = parseFloat(document.getElementById('calc1-pace-s').value) || 0;
+
+        if (!distInput || distInput <= 0 || (paceM === 0 && paceS === 0)) {
+            alert("Please enter a valid distance and entry pace.");
+            return;
+        }
+
+        const totalMeters = convertToMeters(distInput, distUnit);
+        const inputPaceInSeconds = (paceM * 60) + paceS; 
+
+        let totalSeconds = 0;
+        if (paceUnit === 'km') {
+            totalSeconds = (totalMeters / 1000) * inputPaceInSeconds;
+        } else if (paceUnit === 'mi') {
+            totalSeconds = (totalMeters / 1609.344) * inputPaceInSeconds;
+        } else if (paceUnit === '400m') {
+            totalSeconds = (totalMeters / 400) * inputPaceInSeconds;
+        }
+
+        // Render Panel Views
+        document.getElementById('calc1-output-block').classList.remove('hidden');
+        
+        const resDiv = document.getElementById('calc1-results');
+        resDiv.innerHTML = `<p style="font-size:1.25rem;">🏁 <strong>Projected Finish Time:</strong> <span style="color:#059669; font-weight:bold;">${formatTime(totalSeconds)}</span></p>`;
+
+        const splitsDiv = document.getElementById('calc1-splits');
+        splitsDiv.innerHTML = generateSplitsTable(totalMeters, totalSeconds);
+    }
+
+    // --- TRACK 2: CALC PACE FROM TIME ---
+    function calculatePace() {
+        const distInput = parseFloat(document.getElementById('calc2-dist').value);
+        const unit = document.getElementById('calc2-unit').value;
+        const hrs = parseInt(document.getElementById('calc2-time-h').value) || 0;
+        const mins = parseInt(document.getElementById('calc2-time-m').value) || 0;
+        const secs = parseFloat(document.getElementById('calc2-time-s').value) || 0;
+
+        const totalSeconds = (hrs * 3600) + (mins * 60) + secs;
+
+        if (!distInput || distInput <= 0 || totalSeconds <= 0) {
+            alert("Please enter a valid distance and target finish window.");
+            return;
+        }
+
+        const totalMeters = convertToMeters(distInput, unit);
+        
+        const totalKm = totalMeters / 1000;
+        const totalMiles = totalMeters / 1609.344;
+        const totalLaps = totalMeters / 400;
+
+        const secPerKm = totalSeconds / totalKm;
+        const secPerMile = totalSeconds / totalMiles;
+        const secPerLap = totalSeconds / totalLaps;
+
+        // Render Panel Views
+        document.getElementById('calc2-output-block').classList.remove('hidden');
+        
+        const resDiv = document.getElementById('calc2-results');
+        resDiv.innerHTML = `
+            <p>⏱️ <strong>Pace /km:</strong> ${formatTime(secPerKm)}</p>
+            <p>⏱️ <strong>Pace /mile:</strong> ${formatTime(secPerMile)}</p>
+            <p>🏃‍♂️ <strong>Pace /400m Lap:</strong> ${formatTime(secPerLap)}</p>
+        `;
+
+        const splitsDiv = document.getElementById('calc2-splits');
+        splitsDiv.innerHTML = generateSplitsTable(totalMeters, totalSeconds);
+    }
+</script>
+
+</body>
+</html>
