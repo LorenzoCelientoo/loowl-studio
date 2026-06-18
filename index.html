@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Work</title>
+  
+  <!-- Fonts matching your source style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Color palette extracted directly from your source */
+    :root {
+      --black: #080808;
+      --dark: #111111;
+      --orange: #1B3A6B; 
+      --orange-light: #2452A0;
+      --white: #F2F2F2;
+    }
+
+    body {
+      font-family: 'Barlow Condensed', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Container holding the buttons, using the backdrop blur style from your navbar */
+    .link-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 4rem 3rem;
+      background: rgba(8, 8, 8, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-left: 4px solid var(--orange);
+      text-align: center;
+      min-width: 320px;
+    }
+
+    /* Eyebrow text style matching your sections */
+    .eyebrow {
+      font-family: Impact, 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Button styles combining your .cta and .work-tags span aesthetics */
+    .btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: rgba(27, 58, 107, 0.2);
+      border: 2px solid var(--orange);
+      color: var(--white);
+      font-family: Impact, 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.25s, transform 0.2s;
+    }
+
+    /* Hover animation matching your .cta button */
+    .btn:hover {
+      background: var(--orange);
+      transform: translateX(5px);
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div class="link-container">
+    <h1 class="eyebrow">My Work</h1>
+    
+    <a href="http://loowlstudio.com/main.html" class="btn">Main Page</a>
+    <a href="http://loowlstudio.com/Will3.html" class="btn">Will 3</a>
+    <a href="http://loowlstudio.com/workoutapp.html" class="btn">Workout App</a>
+  </div>
+
+</body>
+</html>
