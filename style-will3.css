@@ -652,3 +652,115 @@ p {
         text-align: center;
     }
 }
+/* ==========================================================================
+   DYNAMIC ATHLETIC ANIMATIONS & OVERRIDES
+   ========================================================================== */
+
+/* 1. FAST-TWITCH HERO ENTRANCE */
+@keyframes sprintIn {
+    0% { 
+        opacity: 0; 
+        transform: scale(0.95) translateY(40px); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+.hero-main-logo {
+    animation: sprintIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.hero-tagline {
+    opacity: 0;
+    animation: sprintIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.15s forwards;
+}
+
+.cta-group {
+    opacity: 0;
+    animation: sprintIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
+}
+
+/* 2. KINETIC BUTTON HOVERS */
+.btn-impact {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s ease;
+}
+
+/* Create the high-speed background swipe */
+.btn-impact::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.btn-impact:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.btn-impact:hover {
+    color: #08090a;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* 3. FORWARD-MOMENTUM LIST ITEMS */
+.expect-item {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.3s ease;
+    padding: 1rem;
+    border-radius: 4px;
+    border-left: 0px solid transparent;
+}
+
+.expect-item:hover {
+    transform: translateX(15px);
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 4px solid var(--forest-green-glow);
+}
+
+/* 4. ATHLETIC IMAGE SWIPE/GLARE */
+.image-container-impact {
+    position: relative;
+}
+
+.image-container-impact::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: opticSwipe 7s infinite;
+    z-index: 2;
+    pointer-events: none;
+}
+
+@keyframes opticSwipe {
+    0% { left: -100%; }
+    15% { left: 200%; }
+    100% { left: 200%; }
+}
+
+/* 5. FLOATING HIGHLIGHT TAGS */
+.badge-overlay {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.image-container-impact:hover .badge-overlay {
+    transform: translateY(-5px);
+    background-color: var(--forest-green-glow);
+}
