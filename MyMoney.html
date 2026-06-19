@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MyMoney Tracker</title>
+    
+    <!-- ChartJS Engine Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --income: #22c55e;
+            --expense: #ef4444;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --hover: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --hover: #334155;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; transition: background-color 0.2s, border-color 0.2s; }
+        body { background-color: var(--bg); color: var(--text); padding: 12px; min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+        
+        /* Login Screen Layout */
+        #loginScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 16px; }
+        .login-card { background: var(--surface); padding: 32px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 360px; text-align: center; }
+        .login-card h2 { margin-bottom: 20px; font-size: 1.5rem; }
+        .login-card input { width: 100%; padding: 14px; margin-bottom: 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-align: center; font-size: 1.5rem; letter-spacing: 0.2em; }
+        .error-msg { color: var(--expense); font-size: 0.85rem; display: none; margin-bottom: 10px; font-weight: 600; }
+
+        /* App Workspace Layout */
+        #appWorkspace { display: none; max-width: 1400px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        h1 { font-size: 1.35rem; }
+        
+        .controls-right { display: flex; gap: 8px; align-items: center; width: 100%; justify-content: space-between; }
+        @media(min-width: 600px) {
+            header { flex-wrap: nowrap; }
+            .controls-right { width: auto; justify-content: flex-end; gap: 12px; }
+            h1 { font-size: 1.5rem; }
+            body { padding: 20px; }
+        }
+
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; min-height: 40px; justify-content: center; }
+        .btn-secondary { background: var(--border); color: var(--text); }
+        .btn-secondary:hover { background: var(--hover); }
+        
+        .toggle-container { display: flex; background: var(--border); padding: 4px; border-radius: 8px; }
+        .toggle-btn { border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; background: transparent; font-weight: 500; color: var(--text); font-size: 0.85rem; }
+        .toggle-btn.active { background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .theme-toggle { background: none; border: none; font-size: 1.25rem; cursor: pointer; border-radius: 50%; background: var(--border); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; shrink: 0; }
+
+        .layout { display: flex; flex-direction: column; gap: 16px; }
+        @media(min-width: 900px) {
+            .layout { display: grid; grid-template-columns: 3.5fr 1.5fr; gap: 20px; }
+        }
+
+        .card { background: var(--surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.05); height: 100%; }
+        @media(min-width: 600px) { .card { padding: 20px; } }
+        
+        .view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .view-header h2 { font-size: 1.15rem; text-align: center; font-weight: 700; }
+        @media(min-width: 600px) { .view-header h2 { font-size: 1.4rem; } }
+
+        /* Calendar Grid Engine */
+        .grid-7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        @media(min-width: 600px) { .grid-7 { gap: 8px; } }
+
+        /* Week View Layout Engine */
+        .week-container { display: flex; flex-direction: column; gap: 8px; }
+        @media(min-width: 768px) {
+            .week-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        }
+
+        .day-header { text-align: center; font-weight: 600; font-size: 0.75rem; color: var(--text-muted); padding-bottom: 4px; text-transform: uppercase; }
+        .calendar-day { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; position: relative; min-height: 75px; }
+        .calendar-day:hover { border-color: var(--primary); background: var(--hover); }
+        .calendar-day.other-month { opacity: 0.25; pointer-events: none; }
+        
+        .week-day { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; position: relative; }
+        @media(min-width: 768px) {
+            .week-day { min-height: 400px; padding: 8px; justify-content: space-between; flex-direction: column; gap: 0; }
+        }
+        .week-day:hover { border-color: var(--primary); background: var(--hover); }
+        
+        .week-day-meta { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+        @media(min-width: 768px) {
+            .week-day-meta { flex-direction: column; align-items: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 4px; }
+        }
+
+        .week-day-title { font-weight: bold; font-size: 0.95rem; color: var(--text); }
+        @media(min-width: 768px) { .week-day-title { font-size: 0.8rem; } }
+
+        .week-day-totals-summary { display: flex; gap: 10px; font-size: 0.85rem; }
+        @media(min-width: 768px) {
+            .week-day-totals-summary { flex-direction: column; gap: 0; font-size: 0.72rem; margin-top: auto; padding-top: 4px; border-top: 1px dashed var(--border); width: 100%; text-align: left; }
+        }
+
+        .day-num { font-weight: 700; font-size: 0.85rem; color: var(--text); }
+        @media(min-width: 600px) { .day-num { font-size: 1rem; } }
+
+        .day-totals { font-size: 0.7rem; text-align: right; margin-top: auto; display: flex; flex-direction: column; }
+        @media(min-width: 600px) { .day-totals { font-size: 0.75rem; } }
+        
+        .total-inc { color: var(--income); font-weight: bold; word-break: break-all; }
+        .total-exp { color: var(--expense); font-weight: bold; word-break: break-all; }
+
+        .tx-list-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        @media(min-width: 768px) { .tx-list-container { max-height: 280px; gap: 6px; overflow-y: auto; margin-top: 4px; padding-right: 2px; } }
+        
+        .tx-row-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg); padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; gap: 8px; width: 100%; }
+        @media(min-width: 768px) { .tx-row-item { font-size: 0.78rem; padding: 6px 8px; gap: 4px; } }
+        
+        .tx-delete-btn { color: var(--text-muted); background: transparent; border: none; font-size: 0.9rem; cursor: pointer; font-weight: bold; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; }
+        @media(min-width: 768px) { .tx-delete-btn { font-size: 0.75rem; padding: 2px 4px; } }
+        .tx-delete-btn:hover { color: var(--expense); background: var(--border); }
+
+        /* Analytics View Controls */
+        .range-picker-container { display: flex; flex-wrap: wrap; gap: 12px; background: var(--bg); padding: 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px; align-items: flex-end; }
+        .range-input-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+        .range-input-group label { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: var(--text-muted); }
+        .range-input-group input { padding: 8px 12px; min-height: 38px; font-size: 0.9rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); }
+
+        /* Analytics Workspace Dashboard Panels */
+        .charts-flex-grid { display: flex; flex-direction: column; gap: 24px; padding: 8px 0; }
+        .chart-box-wrapper { background: var(--bg); border: 1px solid var(--border); padding: 16px; border-radius: 8px; width: 100%; position: relative; display: flex; flex-direction: column; align-items: center; }
+        .chart-box-wrapper h3 { font-size: 0.95rem; font-weight: bold; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; width: 100%; text-align: left; }
+        .canvas-container { position: relative; width: 100%; max-height: 260px; display: flex; justify-content: center; }
+
+        /* Sidebar Panels */
+        .summary-box { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+        @media(min-width: 900px) { .summary-box { gap: 16px; margin-top: 16px; } }
+        .summary-section { border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .summary-section:last-child { border: none; padding-bottom: 0; }
+        .summary-section h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; }
+        .summary-row.total { font-weight: bold; font-size: 1rem; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 6px; }
+
+        /* Overlay Systems (Modals) */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 1000; padding: 0; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal { background: var(--surface); padding: 20px; border-top-left-radius: 16px; border-top-right-radius: 16px; width: 100%; max-width: 100%; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); transform: translateY(100%); transition: transform 0.2s ease; border: 1px solid var(--border); border-bottom: none; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.open .modal { transform: translateY(0); }
+        
+        @media(min-width: 480px) {
+            .modal-overlay { align-items: center; padding: 16px; }
+            .modal { border-radius: 12px; border-bottom: 1px solid var(--border); transform: translateY(-20px); max-width: 400px; }
+            .modal-overlay.open .modal { transform: translateY(0); }
+        }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        form { display: flex; flex-direction: column; gap: 10px; }
+        label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+        input, select { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; background: var(--surface); color: var(--text); min-height: 44px; }
+        input:focus, select:focus { outline: 2px solid var(--primary); }
+    </style>
+
+    <!-- Firebase Script Loader Module -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPAbVTbf6ydvnZCXnS_mzNxe9UyaGwWmQ",
+            authDomain: "mymoney-cbcf5.firebaseapp.com",
+            projectId: "mymoney-cbcf5",
+            storageBucket: "mymoney-cbcf5.firebasestorage.app",
+            messagingSenderId: "726259530882",
+            appId: "1:726259530882:web:ee356ff230ad0b2cfec89b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const txCollection = collection(db, "transactions");
+
+        window.currentView = 'month';
+        window.currentDate = new Date();
+        window.allTransactions = [];
+
+        window.checkPassword = function() {
+            const val = document.getElementById('passField').value;
+            if(val === "123321") {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appWorkspace').style.display = 'block';
+                sessionStorage.setItem('authenticated', 'true');
+                startSyncListener();
+            } else {
+                const err = document.getElementById('errBlock');
+                err.style.display = 'block';
+                document.getElementById('passField').value = '';
+            }
+        };
+
+        if (sessionStorage.getItem('authenticated') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appWorkspace').style.display = 'block';
+            startSyncListener();
+        }
+
+        function startSyncListener() {
+            const q = query(txCollection, orderBy("date", "asc"));
+            onSnapshot(q, (snapshot) => {
+                window.allTransactions = [];
+                snapshot.forEach((doc) => {
+                    let data = doc.data();
+                    data.id = doc.id;
+                    window.allTransactions.push(data);
+                });
+                window.render();
+            });
+        }
+
+        window.saveTransaction = async function(e) {
+            e.preventDefault();
+            
+            let selectedCategory = document.getElementById('txCategorySelect').value;
+            if (selectedCategory === "Other") {
+                selectedCategory = document.getElementById('txCategoryCustom').value.trim() || "Other";
+            }
+
+            const payload = {
+                date: document.getElementById('txDate').value,
+                type: document.getElementById('txType').value,
+                category: selectedCategory,
+                amount: parseFloat(document.getElementById('txAmount').value),
+                description: document.getElementById('txDescription').value
+            };
+
+            try {
+                await addDoc(txCollection, payload);
+                document.getElementById('txCategorySelect').value = 'Food';
+                document.getElementById('txCategoryCustom').value = '';
+                document.getElementById('customCategoryWrapper').style.display = 'none';
+                document.getElementById('txAmount').value = '';
+                document.getElementById('txDescription').value = '';
+                window.closeModal();
+            } catch (error) {
+                alert("Writing failed: " + error.message);
+            }
+        };
+
+        window.deleteTransaction = async function(event, docId) {
+            event.stopPropagation();
+            if (confirm("Are you sure you want to remove this transaction entry?")) {
+                try {
+                    await deleteDoc(doc(db, "transactions", docId));
+                } catch (error) {
+                    alert("Removal failed: " + error.message);
+                }
+            }
+        };
+
+        window.exportToCSV = function() {
+            if (window.allTransactions.length === 0) {
+                alert("Nothing available to export.");
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,date,type,category,amount,description\n";
+            window.allTransactions.forEach(tx => {
+                let row = `"${tx.date}","${tx.type}","${tx.category.replace(/"/g, '""')}","${tx.amount}","${(tx.description || '').replace(/"/g, '""')}"`;
+                csvContent += row + "\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `finances_export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    </script>
+</head>
+<body>
+
+    <!-- Lockout Screen Layer -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <h2>MyMoney Secure Lock</h2>
+            <div class="error-msg" id="errBlock">Invalid Password. Try Again.</div>
+            <input type="password" id="passField" placeholder="••••••" onkeydown="if(event.key === 'Enter') checkPassword()">
+            <button class="btn" onclick="checkPassword()" style="width: 100%;">Unlock Ledger</button>
+        </div>
+    </div>
+
+    <!-- Authorized Application Dashboard Container -->
+    <div id="appWorkspace">
+        <header>
+            <h1>MyMoney</h1>
+            <div class="controls-right">
+                <button class="btn btn-secondary" onclick="exportToCSV()" style="padding: 8px 12px;">📥 Export</button>
+                <div class="toggle-container">
+                    <button class="toggle-btn active" id="btnMonth" onclick="switchView('month')">Month</button>
+                    <button class="toggle-btn" id="btnWeek" onclick="switchView('week')">Week</button>
+                    <button class="toggle-btn" id="btnCharts" onclick="switchView('charts')">📊 Graphs</button>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <div class="card">
+                <div class="view-header" id="viewHeaderNav">
+                    <button class="btn btn-secondary" onclick="navigateTime(-1)">&larr;</button>
+                    <h2 id="viewTitle">Month Year</h2>
+                    <button class="btn btn-secondary" onclick="navigateTime(1)">&rarr;</button>
+                </div>
+                
+                <!-- Month Workspace -->
+                <div id="monthView">
+                    <div class="grid-7" style="margin-bottom: 6px;">
+                        <div class="day-header">Su</div><div class="day-header">Mo</div><div class="day-header">Tu</div>
+                        <div class="day-header">We</div><div class="day-header">Th</div><div class="day-header">Fr</div>
+                        <div class="day-header">Sa</div>
+                    </div>
+                    <div class="grid-7" id="calendarGrid"></div>
+                </div>
+
+                <!-- Week Workspace -->
+                <div id="weekView" style="display: none;">
+                    <div class="week-container" id="weekGrid"></div>
+                </div>
+
+                <!-- Charts Workspace -->
+                <div id="chartsView" style="display: none;">
+                    <!-- Interactive Day Range Pickers -->
+                    <div class="range-picker-container" style="margin-bottom: 12px;">
+                        <div style="font-weight: bold; width: 100%; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Weekly Filter</div>
+                        <div class="range-input-group">
+                            <label>Starting Date</label>
+                            <input type="date" id="chartStartDate" onchange="renderCharts()">
+                        </div>
+                        <div class="range-input-group">
+                            <label>Ending Date</label>
+                            <input type="date" id="chartEndDate" onchange="renderCharts()">
+                        </div>
+                        <button class="btn btn-secondary" onclick="setDefaultChartRange()" style="min-height: 38px;">Reset Days</button>
+                    </div>
+
+                    <div class="charts-flex-grid">
+                        <!-- Weekly Chart Box -->
+                        <div class="chart-box-wrapper">
+                            <h3>Weekly Expenses History</h3>
+                            <div class="canvas-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Month-Only Range Pickers (Placed exactly after Weekly Graph) -->
+                    <div class="range-picker-container" style="margin-top: 24px; margin-bottom: 12px;">
+                        <div style="font-weight: bold; width: 100%; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">Monthly Filter</div>
+                        <div class="range-input-group">
+                            <label>Starting Month</label>
+                            <input type="month" id="chartStartMonth" onchange="renderCharts()">
+                        </div>
+                        <div class="range-input-group">
+                            <label>Ending Month</label>
+                            <input type="month" id="chartEndMonth" onchange="renderCharts()">
+                        </div>
+                        <button class="btn btn-secondary" onclick="setDefaultMonthRange()" style="min-height: 38px;">Reset Months</button>
+                    </div>
+
+                    <div class="charts-flex-grid">
+                        <!-- Monthly Chart Box -->
+                        <div class="chart-box-wrapper">
+                            <h3>Monthly Expenses History</h3>
+                            <div class="canvas-container">
+                                <canvas id="monthlyTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balances Sidebar Summary Dashboard -->
+            <div class="sidebar">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3>Financial Balance</h3>
+                        <button class="btn" onclick="openModal()" style="padding: 6px 14px; font-size: 0.85rem;">+ Add</button>
+                    </div>
+                    
+                    <div class="summary-box">
+                        <div class="summary-section">
+                            <h4 id="weekSummaryTitle">Selected Week</h4>
+                            <div class="summary-row"><span>Income:</span><span id="wIncome" style="color: var(--income); font-weight:500;">+$0.00</span></div>
+                            <div class="summary-row"><span>Expenses:</span><span id="wExpense" style="color: var(--expense); font-weight:500;">-$0.00</span></div>
+                            <div class="summary-row total"><span>Net Balance:</span><span id="wNet">$0.00</span></div>
+                        </div>
+
+                        <div class="summary-section">
+                            <h4 id="monthSummaryTitle">Selected Month</h4>
+                            <div class="summary-row"><span>Income:</span><span id="mIncome" style="color: var(--income); font-weight:500;">+$0.00</span></div>
+                            <div class="summary-row"><span>Expenses:</span><span id="mExpense" style="color: var(--expense); font-weight:500;">-$0.00</span></div>
+                            <div class="summary-row total"><span>Net Balance:</span><span id="mNet">$0.00</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Inputs Overlay Panel -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Add Transaction</h3>
+                <button class="btn btn-secondary" onclick="closeModal()" style="padding: 6px 10px;">✕</button>
+            </div>
+            <form id="txForm" onsubmit="saveTransaction(event)">
+                <label>Date</label><input type="date" id="txDate" required>
+                
+                <label>Type</label>
+                <select id="txType"><option value="expense">Expense</option><option value="income">Income</option></select>
+                
+                <label>Category</label>
+                <select id="txCategorySelect" onchange="toggleCustomCategoryField(this.value)">
+                    <option value="Food">🍔 Food & Dining</option>
+                    <option value="Housing">🏠 Rent & Housing</option>
+                    <option value="Transport">🚗 Transport & Car</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Shopping">🛒 Shopping</option>
+                    <option value="Utilities">💡 Utilities</option>
+                    <option value="Salary">💰 Salary & Income</option>
+                    <option value="Other">✨ Other...</option>
+                </select>
+
+                <div id="customCategoryWrapper" style="display: none; flex-direction: column; gap: 4px;">
+                    <label style="font-size: 0.75rem; margin-top: 2px;">Enter Custom Category Name</label>
+                    <input type="text" id="txCategoryCustom" placeholder="e.g. Medical">
+                </div>
+
+                <label>Amount ($)</label><input type="number" step="0.01" id="txAmount" required>
+                <label>Description</label><input type="text" id="txDescription" placeholder="Optional notes">
+                <button type="submit" class="btn" style="margin-top: 8px;">Save to Cloud</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let trendChartInstance = null;
+        let monthlyTrendChartInstance = null;
+
+        // Seed default trailing windows
+        function setDefaultChartRange() {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - 30);
+            
+            document.getElementById('chartStartDate').value = start.toISOString().split('T')[0];
+            document.getElementById('chartEndDate').value = end.toISOString().split('T')[0];
+            if (window.currentView === 'charts') renderCharts();
+        }
+
+        // Trailing 6 months block
+        function setDefaultMonthRange() {
+            const end = new Date();
+            const start = new Date();
+            start.setMonth(end.getMonth() - 5); 
+            
+            const startYear = start.getFullYear();
+            const startMonth = String(start.getMonth() + 1).padStart(2, '0');
+            const endYear = end.getFullYear();
+            const endMonth = String(end.getMonth() + 1).padStart(2, '0');
+
+            document.getElementById('chartStartMonth').value = `${startYear}-${startMonth}`;
+            document.getElementById('chartEndMonth').value = `${endYear}-${endMonth}`;
+            if (window.currentView === 'charts') renderCharts();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setDefaultChartRange();
+            setDefaultMonthRange();
+        });
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', targetTheme);
+            document.getElementById('themeBtn').innerText = targetTheme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('theme', targetTheme);
+            if (window.currentView === 'charts') renderCharts();
+        }
+        if(localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeBtn').innerText = '☀️';
+        }
+
+        function toggleCustomCategoryField(val) {
+            const wrapper = document.getElementById('customCategoryWrapper');
+            if (val === 'Other') {
+                wrapper.style.display = 'flex';
+                document.getElementById('txCategoryCustom').required = true;
+            } else {
+                wrapper.style.display = 'none';
+                document.getElementById('txCategoryCustom').required = false;
+            }
+        }
+
+        function openModal(dateStr = '') {
+            if (dateStr) document.getElementById('txDate').value = dateStr;
+            else document.getElementById('txDate').valueAsDate = new Date();
+            document.getElementById('modalOverlay').classList.add('open');
+        }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+        
+        function switchView(view) {
+            window.currentView = view;
+            document.getElementById('btnMonth').classList.toggle('active', view === 'month');
+            document.getElementById('btnWeek').classList.toggle('active', view === 'week');
+            document.getElementById('btnCharts').classList.toggle('active', view === 'charts');
+            
+            document.getElementById('monthView').style.display = view === 'month' ? 'block' : 'none';
+            document.getElementById('weekView').style.display = view === 'week' ? 'block' : 'none';
+            document.getElementById('chartsView').style.display = view === 'charts' ? 'block' : 'none';
+            
+            document.getElementById('viewHeaderNav').style.display = view === 'charts' ? 'none' : 'flex';
+
+            window.render();
+        }
+
+        function navigateTime(direction) {
+            if (window.currentView === 'month') window.currentDate.setMonth(window.currentDate.getMonth() + direction);
+            else if (window.currentView === 'week') window.currentDate.setDate(window.currentDate.getDate() + (direction * 7));
+            window.render();
+        }
+
+        function getTotalsForDate(dateStr) {
+            return window.allTransactions.reduce((acc, tx) => {
+                if (tx.date === dateStr) {
+                    if (tx.type === 'income') acc.income += tx.amount;
+                    else acc.expense += tx.amount;
+                }
+                return acc;
+            }, { income: 0, expense: 0 });
+        }
+
+        window.render = function() {
+            if (window.currentView === 'month') renderMonth();
+            else if (window.currentView === 'week') renderWeek();
+            else if (window.currentView === 'charts') renderCharts();
+            calculateBalances();
+        }
+
+        function renderMonth() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            document.getElementById('viewTitle').innerText = window.currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const prevLastDay = new Date(year, month, 0).getDate();
+
+            let daysHTML = '';
+            for (let x = firstDayIndex; x > 0; x--) {
+                daysHTML += `<div class="calendar-day other-month"><span class="day-num">${prevLastDay - x + 1}</span></div>`;
+            }
+            for (let i = 1; i <= lastDay; i++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const totals = getTotalsForDate(dateStr);
+                daysHTML += `
+                    <div class="calendar-day" onclick="openModal('${dateStr}')">
+                        <span class="day-num">${i}</span>
+                        <div class="day-totals">
+                            ${totals.income > 0 ? `<div class="total-inc">+$${totals.income.toFixed(0)}</div>` : ''}
+                            ${totals.expense > 0 ? `<div class="total-exp">-$${totals.expense.toFixed(0)}</div>` : ''}
+                        </div>
+                    </div>`;
+            }
+            document.getElementById('calendarGrid').innerHTML = daysHTML;
+        }
+
+        function renderWeek() {
+            const startOfWeek = new Date(window.currentDate);
+            startOfWeek.setDate(window.currentDate.getDate() - window.currentDate.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+            document.getElementById('viewTitle').innerText = `${startOfWeek.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${endOfWeek.toLocaleDateString(undefined, {month:'short', day:'numeric'})}`;
+
+            let weekHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+                const dateStr = day.toISOString().split('T')[0];
+                const totals = getTotalsForDate(dateStr);
+
+                const dayTxs = window.allTransactions.filter(t => t.date === dateStr);
+                let txLines = dayTxs.map(t => `
+                    <div class="tx-row-item" style="color:${t.type==='income'?'var(--income)':'var(--expense)'}">
+                        <span>${t.type==='income'?'+':'-'}$${t.amount.toFixed(0)} <b>${t.category}</b></span>
+                        <button class="tx-delete-btn" onclick="deleteTransaction(event, '${t.id}')">✕</button>
+                    </div>
+                `).join('');
+
+                weekHTML += `
+                    <div class="week-day" onclick="openModal('${dateStr}')">
+                        <div class="week-day-meta">
+                            <div class="week-day-title">
+                                ${day.toLocaleDateString(undefined, {weekday: 'long', month: 'short', day: 'numeric'})}
+                            </div>
+                            <div class="week-day-totals-summary">
+                                ${totals.income > 0 ? `<span class="total-inc">+${totals.income.toFixed(0)}</span>` : ''}
+                                ${totals.expense > 0 ? `<span class="total-exp">-${totals.expense.toFixed(0)}</span>` : ''}
+                            </div>
+                        </div>
+                        ${txLines ? `<div class="tx-list-container">${txLines}</div>` : ''}
+                    </div>`;
+            }
+            document.getElementById('weekGrid').innerHTML = weekHTML;
+        }
+
+        function renderCharts() {
+            if(trendChartInstance) trendChartInstance.destroy();
+            if(monthlyTrendChartInstance) monthlyTrendChartInstance.destroy();
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const labelColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+            // --- 1. PROCESS WEEKLY LOGIC ---
+            const startStr = document.getElementById('chartStartDate').value;
+            const endStr = document.getElementById('chartEndDate').value;
+            
+            if(startStr && endStr) {
+                const filterStartDate = new Date(startStr + 'T00:00:00');
+                const filterEndDate = new Date(endStr + 'T23:59:59');
+
+                const weeklyBuckets = [];
+                let currentTrackDate = new Date(filterStartDate);
+                const dayOffset = currentTrackDate.getDay();
+                currentTrackDate.setDate(currentTrackDate.getDate() - dayOffset);
+
+                while (currentTrackDate <= filterEndDate) {
+                    const wStart = new Date(currentTrackDate);
+                    const wEnd = new Date(currentTrackDate);
+                    wEnd.setDate(wEnd.getDate() + 6);
+                    const label = `${wStart.getMonth()+1}/${wStart.getDate()} - ${wEnd.getMonth()+1}/${wEnd.getDate()}`;
+                    
+                    weeklyBuckets.push({
+                        start: new Date(wStart.setHours(0,0,0,0)),
+                        end: new Date(wEnd.setHours(23,59,59,999)),
+                        label: label,
+                        expense: 0
+                    });
+                    currentTrackDate.setDate(currentTrackDate.getDate() + 7);
+                }
+
+                window.allTransactions.forEach(t => {
+                    if (!t.date) return;
+                    const txDate = new Date(t.date + 'T12:00:00');
+
+                    weeklyBuckets.forEach(bucket => {
+                        if (txDate >= bucket.start && txDate <= bucket.end) {
+                            if (t.type === 'expense') bucket.expense += t.amount;
+                        }
+                    });
+                });
+
+                // Render Chart 1: Weekly Line Chart
+                const ctxTrend = document.getElementById('trendChart').getContext('2d');
+                trendChartInstance = new Chart(ctxTrend, {
+                    type: 'line',
+                    data: {
+                        labels: weeklyBuckets.map(b => b.label),
+                        datasets: [{ label: 'Expense', data: weeklyBuckets.map(b => b.expense), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.06)', tension: 0.2, fill: true }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: labelColor } } },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: labelColor, font: { size: 10 } } },
+                            y: { grid: { color: gridColor }, ticks: { color: labelColor } }
+                        }
+                    }
+                });
+            }
+
+            // --- 2. PROCESS MONTHLY BUCKETING ENGINE ---
+            const startMonthStr = document.getElementById('chartStartMonth').value; 
+            const endMonthStr = document.getElementById('chartEndMonth').value;
+
+            if (startMonthStr && endMonthStr) {
+                const [sYear, sMonth] = startMonthStr.split('-').map(Number);
+                const [eYear, eMonth] = endMonthStr.split('-').map(Number);
+
+                const monthlyBuckets = [];
+                let loopYear = sYear;
+                let loopMonth = sMonth; 
+
+                while (loopYear < eYear || (loopYear === eYear && loopMonth <= eMonth)) {
+                    const monthKey = `${loopYear}-${String(loopMonth).padStart(2, '0')}`;
+                    const dateObj = new Date(loopYear, loopMonth - 1, 1);
+                    const labelDisplay = dateObj.toLocaleString('default', { month: 'short', year: 'numeric' });
+
+                    monthlyBuckets.push({
+                        key: monthKey,
+                        label: labelDisplay,
+                        expense: 0
+                    });
+
+                    loopMonth++;
+                    if (loopMonth > 12) {
+                        loopMonth = 1;
+                        loopYear++;
+                    }
+                }
+
+                window.allTransactions.forEach(t => {
+                    if (!t.date || t.type !== 'expense') return;
+                    const txMonthKey = t.date.substring(0, 7); 
+                    
+                    const targetedBucket = monthlyBuckets.find(b => b.key === txMonthKey);
+                    if (targetedBucket) {
+                        targetedBucket.expense += t.amount;
+                    }
+                });
+
+                // Render Chart 2: Monthly Expenses Bar Graph
+                const ctxMonthlyTrend = document.getElementById('monthlyTrendChart').getContext('2d');
+                monthlyTrendChartInstance = new Chart(ctxMonthlyTrend, {
+                    type: 'bar',
+                    data: {
+                        labels: monthlyBuckets.map(b => b.label),
+                        datasets: [{
+                            label: 'Monthly Expense',
+                            data: monthlyBuckets.map(b => b.expense),
+                            backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: labelColor } } },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: labelColor, font: { size: 10 } } },
+                            y: { grid: { color: gridColor }, ticks: { color: labelColor } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function calculateBalances() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const monthStartStr = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+            const monthEndStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(new Date(year, month + 1, 0).getDate()).padStart(2, '0')}`;
+
+            const startOfWeek = new Date(window.currentDate);
+            startOfWeek.setDate(window.currentDate.getDate() - window.currentDate.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            const weekStartStr = startOfWeek.toISOString().split('T')[0];
+            const weekEndStr = endOfWeek.toISOString().split('T')[0];
+
+            document.getElementById('monthSummaryTitle').innerText = window.currentDate.toLocaleString('default', { month: 'long' }) + " Balance";
+
+            let mInc = 0, mExp = 0, wInc = 0, wExp = 0;
+            window.allTransactions.forEach(tx => {
+                if (tx.date >= monthStartStr && tx.date <= monthEndStr) {
+                    if (tx.type === 'income') mInc += tx.amount; else mExp += tx.amount;
+                }
+                if (tx.date >= weekStartStr && tx.date <= weekEndStr) {
+                    if (tx.type === 'income') wInc += tx.amount; else wExp += tx.amount;
+                }
+            });
+
+            const mNet = mInc - mExp; const wNet = wInc - wExp;
+            document.getElementById('mIncome').innerText = `+$${mInc.toFixed(2)}`;
+            document.getElementById('mExpense').innerText = `-$${mExp.toFixed(2)}`;
+            document.getElementById('mNet').innerText = `${mNet >= 0 ? '' : '-'}$${Math.abs(mNet).toFixed(2)}`;
+            document.getElementById('mNet').style.color = mNet >= 0 ? 'var(--income)' : 'var(--expense)';
+            document.getElementById('wIncome').innerText = `+$${wInc.toFixed(2)}`;
+            document.getElementById('wExpense').innerText = `-$${wExp.toFixed(2)}`;
+            document.getElementById('wNet').innerText = `${wNet >= 0 ? '' : '-'}$${Math.abs(wNet).toFixed(2)}`;
+            document.getElementById('wNet').style.color = wNet >= 0 ? 'var(--income)' : 'var(--expense)';
+        }
+    </script>
+</body>
+</html>
