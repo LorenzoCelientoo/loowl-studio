@@ -176,7 +176,7 @@
             border-radius: 6px;
             font-size: 0.9rem;
             font-weight: bold;
-            cursor: pointer;
+            cursor: flex;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -273,12 +273,13 @@
             margin-bottom: 15px;
         }
 
+        /* Global Frame Layout adjustments for X-axis room */
         .chart-frame {
             position: relative;
             height: 280px;
             width: 100%;
             margin-bottom: 20px;
-            padding: 25px 10px 10px 10px;
+            padding: 20px 10px 22px 10px; 
             background: #fafafa;
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -344,18 +345,27 @@
             body { background: none; padding: 0; margin: 0; }
             .control-panel, .btn, .report-actions { display: none !important; }
             .report-wrapper { display: block !important; }
+            
             .report-page {
                 box-shadow: none;
                 padding: 0;
                 width: 210mm;
-                height: 297mm;
+                height: auto; /* Allow unconstrained layout height scaling */
                 page-break-after: avoid;
             }
+            
+            /* Print Specific Chart fix protecting label clipping profile */
             .chart-frame {
-                height: 240px; 
+                height: 230px !important; 
+                padding: 15px 5px 25px 5px !important; 
                 page-break-inside: avoid;
+                box-sizing: border-box;
             }
-            @page { size: A4 portrait; margin: 15mm; }
+            
+            @page { 
+                size: A4 portrait; 
+                margin: 12mm 15mm 12mm 15mm; 
+            }
         }
     </style>
 </head>
@@ -615,7 +625,6 @@ function refreshLabelsOnly() {
     document.getElementById('avgHR').value = `${rawAvgHR.split(' ')[0]} bpm`;
 }
 
-// Builds individual sub charts with proper data-label positioning to avoid collision profiles
 function createSubChartInstance(containerId, datasetSplits, useMetric) {
     const container = document.getElementById(containerId);
     
@@ -784,7 +793,6 @@ function renderVisualReport() {
     const chartsContainer = document.getElementById('chartsContainer');
     chartsContainer.innerHTML = '';
 
-    // Handle splitting arrays into balanced components across instances
     if (parsedSplits.length <= 10) {
         createSubChartInstance('chartsContainer', parsedSplits, useMetric);
     } else {
