@@ -204,13 +204,12 @@
             margin-bottom: 15px;
         }
 
-        /* FIXED EDGE-TO-EDGE HIGHT CONSTRAINT - Eliminates side letterboxing padding completely */
         .chart-frame {
             position: relative;
             width: 100%;
-            height: 270px; 
-            margin-bottom: 20px;
-            padding: 10px;
+            height: 210px; 
+            margin-bottom: 15px;
+            padding: 6px 10px;
             background: #fafafa;
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -250,8 +249,9 @@
             }
             
             .chart-frame {
-                height: 250px !important;
+                height: 190px !important;
                 width: 100% !important;
+                margin-bottom: 12px;
                 page-break-inside: avoid;
             }
             
@@ -352,8 +352,8 @@
             <div class="section-title">Performance Insights</div>
             <div class="insights-grid">
                 <div class="insight-item">
-                    <div class="sub-label" id="lblBestPace">Best Pace</div>
-                    <div class="sub-val" id="insBestPace">-</div>
+                    <div class="sub-label">Best Split</div>
+                    <div class="sub-val" id="insBestSplit">-</div>
                 </div>
                 <div class="insight-item">
                     <div class="sub-label">Avg Cadence</div>
@@ -523,9 +523,9 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
     });
 
     const minPaceSec = Math.min(...splitSeconds) - 15;
-    const maxPaceSec = Math.max(...splitSeconds) + 45; 
+    const maxPaceSec = Math.max(...splitSeconds) + 40; 
     const minHR = Math.min(...heartRates) - 10;
-    const maxHR = Math.max(...heartRates) + 25; 
+    const maxHR = Math.max(...heartRates) + 20; 
 
     const instance = new Chart(canvas.getContext('2d'), {
         type: 'bar',
@@ -544,9 +544,9 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                     datalabels: {
                         align: 'top',      
                         anchor: 'end',     
-                        offset: 2,
+                        offset: 1,
                         color: '#004c7d',
-                        font: { weight: 'bold', size: 10.5 },
+                        font: { weight: 'bold', size: 10 },
                         formatter: value => secondsToTimeString(value)
                     }
                 },
@@ -557,16 +557,16 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                     borderColor: '#a30000',
                     backgroundColor: '#a30000',
                     borderWidth: 2.5,
-                    pointRadius: 4.5,
+                    pointRadius: 4,
                     yAxisID: 'yHR',
                     order: 1,
                     tension: 0.15,
                     datalabels: {
                         align: 'top',      
                         anchor: 'center',
-                        offset: 6,         
+                        offset: 4,         
                         color: '#a30000',
-                        font: { weight: 'bold', size: 10.5 },
+                        font: { weight: 'bold', size: 10 },
                         formatter: value => value + ' bpm'
                     }
                 }
@@ -576,12 +576,12 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
             responsive: true,
             maintainAspectRatio: false,
             layout: { 
-                padding: { top: 10, bottom: 5, left: 5, right: 5 } 
+                padding: { top: 12, bottom: 0, left: 2, right: 2 } 
             },
             scales: {
                 x: {
                     grid: { display: false },
-                    ticks: { color: '#000', font: { weight: 'bold', size: 11 } }
+                    ticks: { color: '#000', font: { weight: 'bold', size: 10.5 } }
                 },
                 yPace: {
                     type: 'linear',
@@ -589,7 +589,7 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                     min: minPaceSec,
                     max: maxPaceSec,
                     grid: { display: false },
-                    ticks: { color: '#555', callback: value => secondsToTimeString(value) }
+                    ticks: { color: '#555', font: { size: 10 }, callback: value => secondsToTimeString(value) }
                 },
                 yHR: {
                     type: 'linear',
@@ -597,14 +597,14 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                     min: minHR,
                     max: maxHR,
                     grid: { display: true },
-                    ticks: { color: '#555' }
+                    ticks: { color: '#555', font: { size: 10 } }
                 }
             },
             plugins: { 
                 datalabels: { display: true },
                 legend: {
                     position: 'top',
-                    labels: { boxWidth: 30, font: { weight: '600' }, padding: 10 }
+                    labels: { boxWidth: 25, font: { weight: '600', size: 11 }, padding: 6 }
                 }
             }
         }
@@ -624,7 +624,6 @@ function renderVisualReport() {
 
     document.getElementById('lblDistance').innerText = `DISTANCE (${unitLabel.toUpperCase()})`;
     document.getElementById('lblAvgPace').innerText = `AVG PACE (${paceLabel.toUpperCase()})`;
-    document.getElementById('lblBestPace').innerText = `Best Pace (${paceLabel})`;
     document.getElementById('thDist').innerText = `Distance (${unitLabel})`;
     document.getElementById('thPace').innerText = `Pace (${paceLabel})`;
 
@@ -636,14 +635,9 @@ function renderVisualReport() {
     document.getElementById('outAvgPace').innerText = document.getElementById('avgPace').value;
     document.getElementById('outAvgHR').innerText = document.getElementById('avgHR').value;
 
-    let rawBestPaceSec = timeStringToSeconds(parsedSummary['Best Pace']);
-    document.getElementById('insBestPace').innerText = `${secondsToTimeString(rawBestPaceSec)} ${paceLabel}`;
-    document.getElementById('insCadence').innerText = `${parsedSummary['Avg Run Cadence'] || parsedSummary['Avg Cadence'] || '-'} spm`;
-    document.getElementById('insStride').innerText = `${parsedSummary['Avg Stride Length'] || '-'} cm`;
-    
-    let gain = parsedSummary['Elevation Gain'] || '0';
-    let loss = parsedSummary['Elev Loss'] || '0';
-    document.getElementById('insElevation').innerText = `+${gain}m / -${loss}m`;
+    // Scan for the Best Split (Fastest split time)
+    let bestSplitNum = "-";
+    let minSplitSeconds = Infinity;
 
     const tableBody = document.getElementById('tableRowsTarget');
     tableBody.innerHTML = '';
@@ -651,6 +645,12 @@ function renderVisualReport() {
     parsedSplits.forEach(split => {
         let splitDistanceRaw = parseFloat(split['GetDistance']);
         let splitPaceSecondsRaw = timeStringToSeconds(split['Avg Pace']);
+
+        // Check if this is the fastest split record
+        if (splitPaceSecondsRaw > 0 && splitPaceSecondsRaw < minSplitSeconds) {
+            minSplitSeconds = splitPaceSecondsRaw;
+            bestSplitNum = split['Split'];
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -663,6 +663,20 @@ function renderVisualReport() {
         `;
         tableBody.appendChild(tr);
     });
+
+    // Populate performance insights with calculated best split identifier
+    if (minSplitSeconds !== Infinity) {
+        document.getElementById('insBestSplit').innerText = `Split ${bestSplitNum} (${secondsToTimeString(minSplitSeconds)})`;
+    } else {
+        document.getElementById('insBestSplit').innerText = "-";
+    }
+
+    document.getElementById('insCadence').innerText = `${parsedSummary['Avg Run Cadence'] || parsedSummary['Avg Cadence'] || '-'} spm`;
+    document.getElementById('insStride').innerText = `${parsedSummary['Avg Stride Length'] || '-'} cm`;
+    
+    let gain = parsedSummary['Elevation Gain'] || '0';
+    let loss = parsedSummary['Elev Loss'] || '0';
+    document.getElementById('insElevation').innerText = `+${gain}m / -${loss}m`;
 
     activeCharts.forEach(c => c.destroy());
     activeCharts = [];
