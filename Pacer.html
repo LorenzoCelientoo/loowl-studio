@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Race Report Generator (A4 Print Ready)</title>
     
-    <!-- Link to import Bebas Neue from Google Fonts for iconic race typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     
-    <!-- Chart.js and Data Labels Plugin for displaying values on bars/points -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     
@@ -36,7 +34,6 @@
             margin: 0 auto;
         }
 
-        /* Control Panel / Dashboard Styles */
         .control-panel {
             background: white;
             padding: 25px;
@@ -63,17 +60,9 @@
             cursor: pointer;
         }
 
-        .file-upload-box input[type="file"] {
-            display: none;
-        }
+        .file-upload-box input[type="file"] { display: none; }
+        .file-upload-box label { font-weight: bold; color: var(--primary-blue); cursor: pointer; }
 
-        .file-upload-box label {
-            font-weight: bold;
-            color: var(--primary-blue);
-            cursor: pointer;
-        }
-
-        /* Segmented Unit Toggle Control */
         .unit-selector-container {
             display: flex;
             align-items: center;
@@ -85,18 +74,8 @@
             margin-bottom: 20px;
         }
 
-        .unit-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .segmented-control {
-            display: flex;
-            background: #eee;
-            padding: 4px;
-            border-radius: 6px;
-        }
+        .unit-label { font-size: 0.9rem; font-weight: 600; color: #444; }
+        .segmented-control { display: flex; background: #eee; padding: 4px; border-radius: 6px; }
 
         .segment-btn {
             background: none;
@@ -123,25 +102,9 @@
             gap: 15px;
         }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #555;
-            text-transform: uppercase;
-        }
-
-        .form-group input {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 0.95rem;
-        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #555; text-transform: uppercase; }
+        .form-group input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.95rem; }
 
         .btn {
             background-color: var(--primary-blue);
@@ -157,16 +120,9 @@
             transition: background 0.2s;
         }
 
-        .btn:hover {
-            background-color: #003b61;
-        }
+        .btn:hover { background-color: #003b61; }
 
-        /* Report Canvas Actions Bar (Screen Only) */
-        .report-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
+        .report-actions { display: flex; justify-content: flex-end; margin-bottom: 10px; }
 
         .btn-print {
             background-color: var(--action-green);
@@ -176,7 +132,7 @@
             border-radius: 6px;
             font-size: 0.9rem;
             font-weight: bold;
-            cursor: flex;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -184,23 +140,18 @@
             transition: background 0.2s;
         }
 
-        .btn-print:hover {
-            background-color: #1b5e20;
-        }
+        .btn-print:hover { background-color: #1b5e20; }
 
-        /* A4 Print-Optimized Report Layout */
-        .report-wrapper {
-            display: none; /* Hidden until generated */
-        }
+        .report-wrapper { display: none; }
 
         .report-page {
             background: white;
-            padding: 50px;
+            padding: 40px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             box-sizing: border-box;
+            width: 100%;
         }
 
-        /* Updated Header with Iconic Athletic Typography */
         .report-header {
             text-align: center;
             border-bottom: 3px solid #000;
@@ -228,7 +179,6 @@
             text-transform: uppercase;
         }
 
-        /* Updated Metrics Layout with backing texture */
         .metrics-grid {
             display: flex;
             justify-content: space-between;
@@ -239,28 +189,9 @@
             border: 1px solid var(--border-color);
         }
 
-        .metric-card {
-            text-align: center;
-            flex: 1;
-        }
-
-        .metric-card .label {
-            font-size: 0.75rem;
-            color: #666;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        .metric-card .value {
-            font-family: 'Bebas Neue', Impact, sans-serif;
-            font-size: 2.2rem;
-            font-weight: 400;
-            color: #000;
-            letter-spacing: 0.5px;
-            line-height: 1;
-        }
+        .metric-card { text-align: center; flex: 1; }
+        .metric-card .label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; font-weight: 700; }
+        .metric-card .value { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 2.2rem; font-weight: 400; color: #000; letter-spacing: 0.5px; line-height: 1; }
 
         .section-title {
             text-transform: uppercase;
@@ -273,20 +204,19 @@
             margin-bottom: 15px;
         }
 
-        /* Global Frame Layout adjustments for X-axis room */
+        /* FIXED EDGE-TO-EDGE HIGHT CONSTRAINT - Eliminates side letterboxing padding completely */
         .chart-frame {
             position: relative;
-            height: 280px;
             width: 100%;
+            height: 270px; 
             margin-bottom: 20px;
-            padding: 20px 10px 22px 10px; 
+            padding: 10px;
             background: #fafafa;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             box-sizing: border-box;
         }
 
-        /* Performance Insights Style Block */
         .insights-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -298,48 +228,14 @@
             margin-bottom: 10px;
         }
 
-        .insight-item {
-            text-align: center;
-        }
+        .insight-item { text-align: center; }
+        .insight-item .sub-label { font-size: 0.7rem; color: #777; text-transform: uppercase; font-weight: bold; }
+        .insight-item .sub-val { font-size: 1.05rem; font-weight: 700; color: #222; margin-top: 2px; }
 
-        .insight-item .sub-label {
-            font-size: 0.7rem;
-            color: #777;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .insight-item .sub-val {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #222;
-            margin-top: 2px;
-        }
-
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .report-table th {
-            font-size: 0.75rem;
-            color: #444;
-            text-transform: uppercase;
-            border-bottom: 2px solid #000;
-            padding: 6px 4px;
-            text-align: left;
-            font-weight: 700;
-        }
-
-        .report-table td {
-            padding: 8px 4px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9rem;
-        }
-
-        .report-table tr:last-child td {
-            border-bottom: 2px solid #000;
-        }
+        .report-table { width: 100%; border-collapse: collapse; }
+        .report-table th { font-size: 0.75rem; color: #444; text-transform: uppercase; border-bottom: 2px solid #000; padding: 6px 4px; text-align: left; font-weight: 700; }
+        .report-table td { padding: 8px 4px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .report-table tr:last-child td { border-bottom: 2px solid #000; }
 
         @media print {
             body { background: none; padding: 0; margin: 0; }
@@ -349,22 +245,19 @@
             .report-page {
                 box-shadow: none;
                 padding: 0;
-                width: 210mm;
-                height: auto; /* Allow unconstrained layout height scaling */
+                width: 100%;
                 page-break-after: avoid;
             }
             
-            /* Print Specific Chart fix protecting label clipping profile */
             .chart-frame {
-                height: 230px !important; 
-                padding: 15px 5px 25px 5px !important; 
+                height: 250px !important;
+                width: 100% !important;
                 page-break-inside: avoid;
-                box-sizing: border-box;
             }
             
             @page { 
                 size: A4 portrait; 
-                margin: 12mm 15mm 12mm 15mm; 
+                margin: 15mm; 
             }
         }
     </style>
@@ -373,7 +266,6 @@
 
 <div class="container">
 
-    <!-- INPUT DASHBOARD -->
     <div class="control-panel">
         <h2>Race Report Builder</h2>
         
@@ -383,7 +275,6 @@
             <div id="fileStatus" style="font-size: 0.85rem; color: #666; margin-top: 5px;">Supports split tracking CSV files</div>
         </div>
 
-        <!-- Segmented Unit Toggle Control -->
         <div class="unit-selector-container">
             <div class="unit-label">Select File Unit System (Labels Only):</div>
             <div class="segmented-control">
@@ -422,9 +313,7 @@
         <button class="btn" onclick="renderVisualReport()">Generate A4 Print Preview</button>
     </div>
 
-    <!-- REPORT WRAPPER -->
     <div class="report-wrapper" id="reportWrapper">
-        <!-- Interactive Actions Bar -->
         <div class="report-actions">
             <button class="btn-print" onclick="window.print()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
@@ -432,7 +321,6 @@
             </button>
         </div>
 
-        <!-- TARGET PRINT PAGE -->
         <div class="report-page">
             <div class="report-header">
                 <h1 id="outRaceName">-</h1>
@@ -459,7 +347,6 @@
             </div>
 
             <div class="section-title">Pace and Effort by Split</div>
-            <!-- DYNAMIC TARGET FOR 1 OR 2 SPLIT CHARTS -->
             <div id="chartsContainer"></div>
 
             <div class="section-title">Performance Insights</div>
@@ -494,9 +381,7 @@
                         <th>Max HR</th>
                     </tr>
                 </thead>
-                <tbody id="tableRowsTarget">
-                    <!-- Dynamic rows target -->
-                </tbody>
+                <tbody id="tableRowsTarget"></tbody>
             </table>
         </div>
     </div>
@@ -552,9 +437,7 @@ function handleFileSelect(event) {
     document.getElementById('fileStatus').innerText = `Loaded: ${file.name}`;
     
     const reader = new FileReader();
-    reader.onload = function(e) {
-        parseCSVText(e.target.result);
-    };
+    reader.onload = function(e) { parseCSVText(e.target.result); };
     reader.readAsText(file);
 }
 
@@ -563,7 +446,6 @@ function parseCSVText(text) {
     if (lines.length < 2) return;
 
     const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
-    
     parsedSplits = [];
     parsedSummary = {};
 
@@ -572,9 +454,7 @@ function parseCSVText(text) {
         let columns = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
         
         let rowObj = {};
-        headers.forEach((header, index) => {
-            rowObj[header] = columns[index];
-        });
+        headers.forEach((header, index) => { rowObj[header] = columns[index]; });
 
         if (rowObj['Split'] === 'Summary') {
             parsedSummary = rowObj;
@@ -593,7 +473,6 @@ function parseCSVText(text) {
 
 function setUnitSystem(system) {
     currentUnitPreference = system;
-    
     const milesBtn = document.getElementById('btnMiles');
     const kmBtn = document.getElementById('btnKm');
     
@@ -604,7 +483,6 @@ function setUnitSystem(system) {
         milesBtn.classList.add('active');
         kmBtn.classList.remove('active');
     }
-
     refreshLabelsOnly();
 }
 
@@ -646,7 +524,6 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
 
     const minPaceSec = Math.min(...splitSeconds) - 15;
     const maxPaceSec = Math.max(...splitSeconds) + 45; 
-
     const minHR = Math.min(...heartRates) - 10;
     const maxHR = Math.max(...heartRates) + 25; 
 
@@ -699,7 +576,7 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
             responsive: true,
             maintainAspectRatio: false,
             layout: { 
-                padding: { top: 30, bottom: 5, left: 5, right: 5 } 
+                padding: { top: 10, bottom: 5, left: 5, right: 5 } 
             },
             scales: {
                 x: {
@@ -727,12 +604,11 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                 datalabels: { display: true },
                 legend: {
                     position: 'top',
-                    labels: { boxWidth: 30, font: { weight: '600' } }
+                    labels: { boxWidth: 30, font: { weight: '600' }, padding: 10 }
                 }
             }
         }
     });
-    
     activeCharts.push(instance);
 }
 
