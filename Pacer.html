@@ -522,10 +522,10 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
         heartRates.push(parseInt(split['Avg HR'], 10));
     });
 
-    const minPaceSec = Math.min(...splitSeconds) - 15;
-    const maxPaceSec = Math.max(...splitSeconds) + 40; 
-    const minHR = Math.min(...heartRates) - 10;
-    const maxHR = Math.max(...heartRates) + 20; 
+    const minPaceSec = Math.min(...splitSeconds) - 20;
+    const maxPaceSec = Math.max(...splitSeconds) + 45; 
+    const minHR = Math.min(...heartRates) - 15;
+    const maxHR = Math.max(...heartRates) + 25; 
 
     const instance = new Chart(canvas.getContext('2d'), {
         type: 'bar',
@@ -542,11 +542,12 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                     order: 2,
                     barPercentage: 0.55,
                     datalabels: {
-                        align: 'top',      
-                        anchor: 'end',     
-                        offset: 1,
+                        // FIX: Tuck pace text cleanly inside the bar top to stay clear of the HR line
+                        anchor: 'end',
+                        align: 'start',      
+                        offset: 4,
                         color: '#004c7d',
-                        font: { weight: 'bold', size: 10 },
+                        font: { weight: 'bold', size: 10.5 },
                         formatter: value => secondsToTimeString(value)
                     }
                 },
@@ -562,11 +563,12 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
                     order: 1,
                     tension: 0.15,
                     datalabels: {
+                        // FIX: Push HR numbers strictly above the plot dots
+                        anchor: 'end',
                         align: 'top',      
-                        anchor: 'center',
-                        offset: 4,         
+                        offset: 8,         
                         color: '#a30000',
-                        font: { weight: 'bold', size: 10 },
+                        font: { weight: 'bold', size: 10.5 },
                         formatter: value => value + ' bpm'
                     }
                 }
@@ -576,7 +578,7 @@ function createSubChartInstance(containerId, datasetSplits, useMetric) {
             responsive: true,
             maintainAspectRatio: false,
             layout: { 
-                padding: { top: 12, bottom: 0, left: 2, right: 2 } 
+                padding: { top: 16, bottom: 0, left: 2, right: 2 } 
             },
             scales: {
                 x: {
@@ -635,7 +637,6 @@ function renderVisualReport() {
     document.getElementById('outAvgPace').innerText = document.getElementById('avgPace').value;
     document.getElementById('outAvgHR').innerText = document.getElementById('avgHR').value;
 
-    // Scan for the Best Split (Fastest split time)
     let bestSplitNum = "-";
     let minSplitSeconds = Infinity;
 
@@ -646,7 +647,6 @@ function renderVisualReport() {
         let splitDistanceRaw = parseFloat(split['GetDistance']);
         let splitPaceSecondsRaw = timeStringToSeconds(split['Avg Pace']);
 
-        // Check if this is the fastest split record
         if (splitPaceSecondsRaw > 0 && splitPaceSecondsRaw < minSplitSeconds) {
             minSplitSeconds = splitPaceSecondsRaw;
             bestSplitNum = split['Split'];
@@ -664,7 +664,6 @@ function renderVisualReport() {
         tableBody.appendChild(tr);
     });
 
-    // Populate performance insights with calculated best split identifier
     if (minSplitSeconds !== Infinity) {
         document.getElementById('insBestSplit').innerText = `Split ${bestSplitNum} (${secondsToTimeString(minSplitSeconds)})`;
     } else {
