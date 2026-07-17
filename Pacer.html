@@ -3,700 +3,819 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Race Report Generator (A4 Print Ready)</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    
+    <title>Track Prep - Runner's Pace & Time Calculator</title>
+    <!-- Import Retro-Athletic Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #00558c;
-            --light-blue: rgba(0, 85, 140, 0.05);
-            --dark-text: #222;
-            --border-color: #ddd;
-            --action-green: #2e7d32;
+            --bg:     #f0e8d5;
+            --dark:   #1a2240;
+            --red:    #c8341a;
+            --tan:    #d4c4a0;
+            --stripe: rgba(26,34,64,0.04);
+            --border: rgba(26,34,64,0.15);
+            --shadow-sm: 2px 3px 0 rgba(26,34,64,0.12);
+            --shadow:    3px 4px 0 rgba(26,34,64,0.16);
+            --shadow-lg: 4px 6px 0 rgba(26,34,64,0.22);
+            --r: 4px;
+        }
+
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        html {
+            overflow-x: hidden;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f6f9;
-            color: var(--dark-text);
+            font-family: 'Barlow', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            font-size: 14px;
+            padding-top: 80px;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
         }
 
-        .container {
-            max-width: 800px;
+        /* Paper grain texture */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 2;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+        }
+
+        /* Diagonal background stripes */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 1;
+            background: repeating-linear-gradient(-55deg,transparent,transparent 38px,var(--stripe) 38px,var(--stripe) 39px);
+        }
+
+        /* ── TOPBAR & HEADER ── */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 7px; z-index: 500;
+            background: repeating-linear-gradient(90deg,var(--red) 0,var(--red) 28px,var(--dark) 28px,var(--dark) 56px);
+        }
+
+        header {
+            position: fixed; top: 7px; left: 0; right: 0; height: 60px;
+            background: var(--dark);
+            display: flex; align-items: center;
+            justify-content: center;
+            padding: 0 22px; z-index: 400;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            display: flex; align-items: baseline; gap: 6px; line-height: 1;
+        }
+        .logo-main { 
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 26px; 
+            letter-spacing: 0.12em; 
+            color: var(--bg); 
+        }
+        .logo-accent { 
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 26px; 
+            letter-spacing: 0.12em; 
+            color: var(--red); 
+        }
+
+        /* ── APP LAYOUT CONTAINER ── */
+        .app-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 600px;
             margin: 0 auto;
-        }
-
-        .control-panel {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-
-        .control-panel h2 {
-            margin-top: 0;
-            color: var(--primary-blue);
-            font-size: 1.4rem;
-            border-bottom: 2px solid var(--light-blue);
-            padding-bottom: 10px;
-        }
-
-        .file-upload-box {
-            background-color: var(--light-blue);
-            border: 2px dashed var(--primary-blue);
-            border-radius: 6px;
             padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
+        }
+
+        /* ── TAB NAVIGATION ── */
+        .view-tabs {
+            display: flex; 
+            gap: 4px;
+            margin-bottom: -1.5px; /* Pull up to join the card border */
+            position: relative; 
+            z-index: 11;
+        }
+
+        .view-tab {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 15px; 
+            letter-spacing: 0.18em;
+            padding: 10px 24px;
+            background: rgba(26,34,64,0.08);
+            border: 1.5px solid var(--border);
+            border-bottom: none;
+            border-radius: var(--r) var(--r) 0 0;
+            color: var(--dark); 
+            opacity: 0.55;
             cursor: pointer;
+            transition: opacity 0.18s, background 0.18s;
         }
 
-        .file-upload-box input[type="file"] { display: none; }
-        .file-upload-box label { font-weight: bold; color: var(--primary-blue); cursor: pointer; }
+        .view-tab.active {
+            background: var(--bg);
+            opacity: 1; 
+            border-color: var(--border);
+            box-shadow: none;
+        }
 
-        .unit-selector-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fafafa;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+        .view-tab:hover:not(.active) { 
+            opacity: 0.85; 
+            background: rgba(26,34,64,0.04);
+        }
+
+        /* ── MAIN CARD ── */
+        .card { 
+            background: var(--bg); 
+            border: 1.5px solid var(--border); 
+            border-radius: 0 var(--r) var(--r) var(--r); 
+            padding: 24px; 
+            box-shadow: var(--shadow); 
             margin-bottom: 20px;
         }
 
-        .unit-label { font-size: 0.9rem; font-weight: 600; color: #444; }
-        .segmented-control { display: flex; background: #eee; padding: 4px; border-radius: 6px; }
-
-        .segment-btn {
-            background: none;
-            border: none;
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #666;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
+        .tab-content {
+            display: none;
         }
 
-        .segment-btn.active {
-            background: var(--primary-blue);
-            color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .tab-content.active {
+            display: block;
         }
 
-        .meta-form {
+        /* ── FORM ELEMENTS ── */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label { 
+            display: block;
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 16px; 
+            letter-spacing: 0.22em; 
+            color: rgba(26,34,64,0.5); 
+            margin-bottom: 8px; 
+        }
+
+        .quick-select {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn-quick {
+            background: var(--tan);
+            color: var(--dark);
+            border: 1.5px solid var(--border);
+            padding: 8px;
+            border-radius: var(--r);
+            cursor: pointer;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.12em;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-quick:hover {
+            background: var(--dark);
+            color: var(--bg);
+            border-color: var(--dark);
+        }
+
+        .btn-quick.active {
+            background: var(--red);
+            color: #fff;
+            border-color: var(--red);
+        }
+
+        input[type="number"] { 
+            width: 100%; 
+            padding: 9px 12px; 
+            border: 1.5px solid var(--border); 
+            border-radius: var(--r); 
+            font-size: 16px; 
+            font-family: 'Barlow', sans-serif; 
+            color: var(--dark); 
+            background: rgba(255,255,255,0.5); 
+            outline: none; 
+            transition: border-color 0.2s; 
+        }
+
+        input[type="number"]:focus { 
+            border-color: var(--red); 
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .time-box {
+            text-align: center;
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(26,34,64,0.45);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ── MULTI UNIT PACE ROW ── */
+        .pace-unit-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
 
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #555; text-transform: uppercase; }
-        .form-group input { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.95rem; }
-
-        .btn {
-            background-color: var(--primary-blue);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 100%;
-            transition: background 0.2s;
+        .pace-box {
+            background: var(--tan);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .btn:hover { background-color: #003b61; }
+        .pace-box .box-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            color: rgba(26,34,64,0.5);
+            margin-bottom: 8px;
+        }
 
-        .report-actions { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-
-        .btn-print {
-            background-color: var(--action-green);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
+        .pace-fields {
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background 0.2s;
+            gap: 4px;
         }
 
-        .btn-print:hover { background-color: #1b5e20; }
-
-        .report-wrapper { display: none; }
-
-        .report-page {
-            background: white;
-            padding: 40px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            box-sizing: border-box;
+        .pace-fields input {
             width: 100%;
+            background: rgba(255,255,255,0.4);
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            color: var(--dark);
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 4px 0;
+            outline: none;
         }
 
-        .report-header {
-            text-align: center;
-            border-bottom: 3px solid #000;
-            padding-bottom: 8px;
+        .pace-fields input:focus {
+            border-color: var(--red);
+        }
+
+        .pace-fields span {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            color: var(--dark);
+            opacity: 0.6;
+        }
+
+        /* ── ACTION BUTTONS ── */
+        .btn-calc { 
+            width: 100%;
+            padding: 12px 20px; 
+            border-radius: 3px; 
+            font-family: 'Bebas Neue', sans-serif; 
+            font-size: 16px; 
+            letter-spacing: 0.18em; 
+            cursor: pointer; 
+            border: none; 
+            background: var(--dark); 
+            color: var(--bg);
+            transition: background 0.2s; 
+            white-space: nowrap; 
+            box-shadow: var(--shadow-sm);
+            margin-top: 10px;
+        }
+
+        .btn-calc:hover { 
+            background: var(--red); 
+        }
+
+        /* ── RESULTS LAYOUT ── */
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .pace-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin-bottom: 25px;
         }
 
-        .report-header h1 {
-            font-family: 'Bebas Neue', Impact, sans-serif;
-            margin: 0;
-            font-size: 3.2rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 400;
+        .pace-card {
+            background: var(--tan);
+            padding: 15px;
+            border-radius: var(--r);
+            text-align: center;
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .pace-card .label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            color: rgba(26,34,64,0.45);
+            margin-bottom: 5px;
+        }
+
+        .pace-card .value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            letter-spacing: 0.04em;
+            color: var(--dark);
             line-height: 1;
         }
 
-        .report-header h2 {
-            font-family: 'Bebas Neue', Impact, sans-serif;
-            margin: 8px 0 0 0;
-            font-size: 1.5rem;
-            color: #555;
-            letter-spacing: 4px;
-            font-weight: 400;
-            text-transform: uppercase;
-        }
-
-        .metrics-grid {
+        .splits-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 25px;
-            background: #fafafa;
-            padding: 15px 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            align-items: center;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
         }
 
-        .metric-card { text-align: center; flex: 1; }
-        .metric-card .label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; font-weight: 700; }
-        .metric-card .value { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 2.2rem; font-weight: 400; color: #000; letter-spacing: 0.5px; line-height: 1; }
-
-        .section-title {
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            font-weight: 700;
-            border-bottom: 1px solid #000;
-            padding-bottom: 4px;
-            margin-top: 25px;
-            margin-bottom: 15px;
+        .splits-header label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.22em;
+            color: rgba(26,34,64,0.45);
+            margin-bottom: 0;
         }
 
-        .chart-frame {
-            position: relative;
+        .split-interval-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .split-interval-input input {
+            width: 70px;
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.5);
+            border: 1.5px solid var(--border);
+            border-radius: var(--r);
+            color: var(--dark);
+            font-size: 0.95rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .split-interval-input input:focus {
+            border-color: var(--red);
+        }
+
+        .split-interval-input span {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            color: rgba(26,34,64,0.5);
+        }
+
+        /* ── TABLE DESIGN ── */
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: var(--r);
+            border: 1.5px solid var(--border);
+            background: #faf5ec;
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
             width: 100%;
-            height: 210px; 
-            margin-bottom: 15px;
-            padding: 6px 10px;
-            background: #fafafa;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            box-sizing: border-box;
+            border-collapse: collapse;
+            text-align: left;
         }
 
-        .insights-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            background: #fafafa;
-            padding: 12px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            margin-bottom: 10px;
+        th, td {
+            padding: 10px 14px;
+            font-size: 13px;
         }
 
-        .insight-item { text-align: center; }
-        .insight-item .sub-label { font-size: 0.7rem; color: #777; text-transform: uppercase; font-weight: bold; }
-        .insight-item .sub-val { font-size: 1.05rem; font-weight: 700; color: #222; margin-top: 2px; }
+        th {
+            background: var(--dark);
+            color: var(--bg);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.16em;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-        .report-table { width: 100%; border-collapse: collapse; }
-        .report-table th { font-size: 0.75rem; color: #444; text-transform: uppercase; border-bottom: 2px solid #000; padding: 6px 4px; text-align: left; font-weight: 700; }
-        .report-table td { padding: 8px 4px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        .report-table tr:last-child td { border-bottom: 2px solid #000; }
+        tr:not(:last-child) {
+            border-bottom: 1px solid var(--border);
+        }
 
-        @media print {
-            body { background: none; padding: 0; margin: 0; }
-            .control-panel, .btn, .report-actions { display: none !important; }
-            .report-wrapper { display: block !important; }
-            
-            .report-page {
-                box-shadow: none;
-                padding: 0;
-                width: 100%;
-                page-break-after: avoid;
-            }
-            
-            .chart-frame {
-                height: 190px !important;
-                width: 100% !important;
-                margin-bottom: 12px;
-                page-break-inside: avoid;
-            }
-            
-            @page { 
-                size: A4 portrait; 
-                margin: 15mm; 
-            }
+        tr:hover {
+            background: rgba(26,34,64,0.03);
+        }
+
+        /* Custom Scrollbar */
+        .table-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<!-- Retro Topbar -->
+<div class="topbar"></div>
 
-    <div class="control-panel">
-        <h2>Race Report Builder</h2>
-        
-        <div class="file-upload-box" onclick="document.getElementById('csvFileInput').click()">
-            <label for="csvFileInput">➔ Click to upload your Split CSV File</label>
-            <input type="file" id="csvFileInput" accept=".csv" onchange="handleFileSelect(event)">
-            <div id="fileStatus" style="font-size: 0.85rem; color: #666; margin-top: 5px;">Supports split tracking CSV files</div>
-        </div>
+<!-- Retro Header -->
+<header>
+    <div class="logo">
+        <span class="logo-main">TRACK</span>
+        <span class="logo-accent">PREP</span>
+    </div>
+</header>
 
-        <div class="unit-selector-container">
-            <div class="unit-label">Select File Unit System (Labels Only):</div>
-            <div class="segmented-control">
-                <button type="button" class="segment-btn active" id="btnMiles" onclick="setUnitSystem('miles')">Miles (mi)</button>
-                <button type="button" class="segment-btn" id="btnKm" onclick="setUnitSystem('km')">Kilometers (km)</button>
-            </div>
-        </div>
-
-        <div class="meta-form">
-            <div class="form-group">
-                <label>Race/Activity Name</label>
-                <input type="text" id="raceName" value="TEMPO RUN REPORT">
-            </div>
-            <div class="form-group">
-                <label>Date</label>
-                <input type="text" id="raceDate" value="07/03/2026">
-            </div>
+<div class="app-container">
+    <!-- Tab Navigation -->
+    <div class="view-tabs">
+        <button class="view-tab active" onclick="switchTab('calc-splits')">Calculate Splits</button>
+        <button class="view-tab" onclick="switchTab('predict-time')">Predict Time</button>
+    </div>
+    
+    <!-- Main Form Container -->
+    <div class="card">
+        <!-- Tab 1: Calculate Splits -->
+        <div id="calc-splits" class="tab-content active">
+            <!-- Distance Selector -->
             <div class="form-group">
                 <label>Distance</label>
-                <input type="text" id="totalDist" placeholder="Calculating...">
+                <div class="quick-select">
+                    <button type="button" class="btn-quick" onclick="setDistance(1000, 'distance-t1')">1K</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(1609.34, 'distance-t1')">Mile</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(5000, 'distance-t1')">5K</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(10000, 'distance-t1')">10K</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(21097.5, 'distance-t1')">Half</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(42195, 'distance-t1')">Full</button>
+                </div>
+                <input type="number" id="distance-t1" placeholder="Distance in meters (e.g. 5000)" min="100">
             </div>
+
+            <!-- Target Time Input -->
             <div class="form-group">
-                <label>Total Time</label>
-                <input type="text" id="totalTime" placeholder="Calculating...">
+                <label>Target Time</label>
+                <div class="time-inputs">
+                    <div class="time-box">
+                        <input type="number" id="hours-t1" min="0" value="0" placeholder="00">
+                        <span>Hrs</span>
+                    </div>
+                    <div class="time-box">
+                        <input type="number" id="minutes-t1" min="0" max="59" value="0" placeholder="00">
+                        <span>Min</span>
+                    </div>
+                    <div class="time-box">
+                        <input type="number" id="seconds-t1" min="0" max="59" value="0" placeholder="00">
+                        <span>Sec</span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Avg Pace</label>
-                <input type="text" id="avgPace" placeholder="Calculating...">
-            </div>
-            <div class="form-group">
-                <label>Avg Heart Rate</label>
-                <input type="text" id="avgHR" placeholder="Calculating...">
-            </div>
+
+            <button type="button" class="btn-calc" onclick="calculatePaceToSplits()">Calculate Pace & Splits</button>
         </div>
 
-        <button class="btn" onclick="renderVisualReport()">Generate A4 Print Preview</button>
+        <!-- Tab 2: Predict Time from Pace -->
+        <div id="predict-time" class="tab-content">
+            <!-- Distance Selector -->
+            <div class="form-group">
+                <label>Distance</label>
+                <div class="quick-select">
+                    <button type="button" class="btn-quick" onclick="setDistance(1000, 'distance-t2')">1K</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(1609.34, 'distance-t2')">Mile</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(5000, 'distance-t2')">5K</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(10000, 'distance-t2')">10K</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(21097.5, 'distance-t2')">Half</button>
+                    <button type="button" class="btn-quick" onclick="setDistance(42195, 'distance-t2')">Full</button>
+                </div>
+                <input type="number" id="distance-t2" placeholder="Distance in meters (e.g. 5000)" min="100">
+            </div>
+
+            <!-- Target Pace -->
+            <div class="form-group">
+                <label>Target Pace</label>
+                <div class="pace-unit-row">
+                    <!-- KM Pace Input -->
+                    <div class="pace-box">
+                        <div class="box-label">Pace per KM</div>
+                        <div class="pace-fields">
+                            <input type="number" id="pace-km-min" placeholder="0" min="0" oninput="syncPace('km')">
+                            <span>:</span>
+                            <input type="number" id="pace-km-sec" placeholder="00" min="0" max="59" oninput="syncPace('km')">
+                            <span>/km</span>
+                        </div>
+                    </div>
+
+                    <!-- Mile Pace Input -->
+                    <div class="pace-box">
+                        <div class="box-label">Pace per Mile</div>
+                        <div class="pace-fields">
+                            <input type="number" id="pace-mi-min" placeholder="0" min="0" oninput="syncPace('mi')">
+                            <span>:</span>
+                            <input type="number" id="pace-mi-sec" placeholder="00" min="0" max="59" oninput="syncPace('mi')">
+                            <span>/mi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn-calc" onclick="calculatePaceToTime()">Predict Time & Splits</button>
+        </div>
     </div>
 
-    <div class="report-wrapper" id="reportWrapper">
-        <div class="report-actions">
-            <button class="btn-print" onclick="window.print()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Print / Save PDF
-            </button>
+    <!-- Shared Results Panel -->
+    <div class="results card" id="results">
+        <div class="pace-cards">
+            <div class="pace-card" id="card-1">
+                <div class="label" id="card-1-title">Pace per KM</div>
+                <div class="value" id="card-1-val">--:--</div>
+            </div>
+            <div class="pace-card" id="card-2">
+                <div class="label" id="card-2-title">Pace per Mile</div>
+                <div class="value" id="card-2-val">--:--</div>
+            </div>
         </div>
 
-        <div class="report-page">
-            <div class="report-header">
-                <h1 id="outRaceName">-</h1>
-                <h2 id="outRaceDate">-</h2>
+        <div class="splits-header">
+            <label>Cumulative Splits</label>
+            <div class="split-interval-input">
+                <span>Every</span>
+                <input type="number" id="split-distance" value="200" min="1" oninput="updateSplitsOnIntervalChange()">
+                <span>meters</span>
             </div>
-
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="label" id="lblDistance">DISTANCE</div>
-                    <div class="value" id="outDist">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">TOTAL TIME</div>
-                    <div class="value" id="outTotalTime">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label" id="lblAvgPace">AVG PACE</div>
-                    <div class="value" id="outAvgPace">-</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">AVG HEART RATE</div>
-                    <div class="value" id="outAvgHR">-</div>
-                </div>
-            </div>
-
-            <div class="section-title">Pace and Effort by Split</div>
-            <div id="chartsContainer"></div>
-
-            <div class="section-title">Performance Insights</div>
-            <div class="insights-grid">
-                <div class="insight-item">
-                    <div class="sub-label">Best Split</div>
-                    <div class="sub-val" id="insBestSplit">-</div>
-                </div>
-                <div class="insight-item">
-                    <div class="sub-label">Avg Cadence</div>
-                    <div class="sub-val" id="insCadence">-</div>
-                </div>
-                <div class="insight-item">
-                    <div class="sub-label">Avg Stride Length</div>
-                    <div class="sub-val" id="insStride">-</div>
-                </div>
-                <div class="insight-item">
-                    <div class="sub-label">Elevation Gain/Loss</div>
-                    <div class="sub-val" id="insElevation">-</div>
-                </div>
-            </div>
-
-            <div class="section-title">Summary by Split</div>
-            <table class="report-table">
+        </div>
+        
+        <div class="table-container">
+            <table>
                 <thead>
                     <tr>
-                        <th>Split</th>
-                        <th>Time</th>
-                        <th id="thDist">Distance</th>
-                        <th id="thPace">Pace</th>
-                        <th>Avg HR</th>
-                        <th>Max HR</th>
+                        <th>Distance</th>
+                        <th>Split Time</th>
                     </tr>
                 </thead>
-                <tbody id="tableRowsTarget"></tbody>
+                <tbody id="splits-body">
+                    <!-- Rows generated dynamically -->
+                </tbody>
             </table>
         </div>
     </div>
-
 </div>
 
 <script>
-Chart.register(ChartDataLabels);
+    // Constants
+    const METERS_PER_MILE = 1609.344;
 
-let parsedSplits = [];
-let parsedSummary = {};
-let activeCharts = []; 
-let currentUnitPreference = 'miles'; 
+    // Cache calculation details globally
+    let activeCalculation = {
+        distance: 0,
+        totalSeconds: 0,
+        pacePerKm: 0,
+        pacePerMile: 0,
+        targetLabel: "Target Time",
+        card2IsMilePace: false
+    };
 
-function cleanTimeFormat(timeString) {
-    if (!timeString) return "-";
-    let cleaned = timeString.split(' ')[0].split('/')[0];
-    let components = cleaned.trim().split(':');
-    if (components.length === 3 && components[0] === '00') {
-        return `${parseInt(components[1], 10)}:${components[2]}`;
+    // Tab Switching
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+
+        const activeBtn = event.currentTarget;
+        document.querySelectorAll('.view-tab').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        activeBtn.classList.add('active');
+
+        // Hide results until calculated
+        document.getElementById('results').style.display = 'none';
     }
-    return cleaned;
-}
 
-function timeStringToSeconds(str) {
-    let cleaned = str.split(' ')[0].split('/')[0];
-    let parts = cleaned.trim().split(':');
-    if (parts.length === 3) {
-        return (parseInt(parts[0], 10) * 3600) + (parseInt(parts[1], 10) * 60) + parseInt(parts[2], 10);
-    } else if (parts.length === 2) {
-        return (parseInt(parts[0], 10) * 60) + parseInt(parts[1], 10);
-    }
-    return 0;
-}
-
-function secondsToTimeString(secs) {
-    let m = Math.floor(secs / 60);
-    let s = Math.floor(secs % 60);
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
-function updateDocumentTitle() {
-    const rName = document.getElementById('raceName').value || "Race";
-    const rDate = document.getElementById('raceDate').value || "";
-    const cleanDate = rDate.replace(/[\/\\*?:"<>|]/g, "-");
-    document.title = `${rName.toUpperCase().replace(/\s+/g, '_')}_REPORT_${cleanDate}`;
-}
-
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    document.getElementById('fileStatus').innerText = `Loaded: ${file.name}`;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) { parseCSVText(e.target.result); };
-    reader.readAsText(file);
-}
-
-function parseCSVText(text) {
-    const lines = text.split(/\r?\n/);
-    if (lines.length < 2) return;
-
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^["']|["']$/g, ''));
-    parsedSplits = [];
-    parsedSummary = {};
-
-    for (let i = 1; i < lines.length; i++) {
-        if (!lines[i].trim()) continue;
-        let columns = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
+    // Quick Selector Settings
+    function setDistance(meters, inputId) {
+        document.getElementById(inputId).value = meters;
         
-        let rowObj = {};
-        headers.forEach((header, index) => { rowObj[header] = columns[index]; });
-
-        if (rowObj['Split'] === 'Summary') {
-            parsedSummary = rowObj;
-        } else if (rowObj['Split']) {
-            parsedSplits.push(rowObj);
-        }
+        const parentContainer = document.getElementById(inputId).parentElement;
+        const buttons = parentContainer.querySelectorAll('.btn-quick');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
     }
 
-    let summaryPaceStr = parsedSummary['Avg Pace'] || "";
-    if (summaryPaceStr.includes('/km') || summaryPaceStr.includes('k')) {
-        setUnitSystem('km');
-    } else {
-        setUnitSystem('miles');
-    }
-}
+    // Unit Syncing Logic
+    function syncPace(sourceUnit) {
+        if (sourceUnit === 'km') {
+            const min = parseInt(document.getElementById('pace-km-min').value) || 0;
+            const sec = parseInt(document.getElementById('pace-km-sec').value) || 0;
+            const totalSecPerKm = (min * 60) + sec;
 
-function setUnitSystem(system) {
-    currentUnitPreference = system;
-    const milesBtn = document.getElementById('btnMiles');
-    const kmBtn = document.getElementById('btnKm');
-    
-    if (system === 'km') {
-        kmBtn.classList.add('active');
-        milesBtn.classList.remove('active');
-    } else {
-        milesBtn.classList.add('active');
-        kmBtn.classList.remove('active');
-    }
-    refreshLabelsOnly();
-}
+            if (totalSecPerKm > 0) {
+                const totalSecPerMile = totalSecPerKm * (METERS_PER_MILE / 1000);
+                const mileMin = Math.floor(totalSecPerMile / 60);
+                const mileSec = Math.round(totalSecPerMile % 60);
 
-function refreshLabelsOnly() {
-    if (!parsedSummary['GetDistance']) return;
+                document.getElementById('pace-mi-min').value = mileMin || '';
+                document.getElementById('pace-mi-sec').value = String(mileSec).padStart(2, '0');
+            } else {
+                document.getElementById('pace-mi-min').value = '';
+                document.getElementById('pace-mi-sec').value = '';
+            }
+        } 
+        else if (sourceUnit === 'mi') {
+            const min = parseInt(document.getElementById('pace-mi-min').value) || 0;
+            const sec = parseInt(document.getElementById('pace-mi-sec').value) || 0;
+            const totalSecPerMile = (min * 60) + sec;
 
-    const useMetric = (currentUnitPreference === 'km');
-    const unitLabel = useMetric ? "km" : "mi";
-    const paceLabel = useMetric ? "/km" : "/mi";
-    
-    let rawDistance = parseFloat(parsedSummary['GetDistance']);
-    let rawAvgPaceSec = timeStringToSeconds(parsedSummary['Avg Pace']);
-    let rawAvgHR = parsedSummary['Avg HR'] || "-";
+            if (totalSecPerMile > 0) {
+                const totalSecPerKm = totalSecPerMile / (METERS_PER_MILE / 1000);
+                const kmMin = Math.floor(totalSecPerKm / 60);
+                const kmSec = Math.round(totalSecPerKm % 60);
 
-    document.getElementById('totalDist').value = `${rawDistance.toFixed(2)} ${unitLabel}`;
-    document.getElementById('totalTime').value = cleanTimeFormat(parsedSummary['Time']);
-    document.getElementById('avgPace').value = `${secondsToTimeString(rawAvgPaceSec)} ${paceLabel}`;
-    document.getElementById('avgHR').value = `${rawAvgHR.split(' ')[0]} bpm`;
-}
-
-function createSubChartInstance(containerId, datasetSplits, useMetric) {
-    const container = document.getElementById(containerId);
-    
-    const frame = document.createElement('div');
-    frame.className = 'chart-frame';
-    const canvas = document.createElement('canvas');
-    frame.appendChild(canvas);
-    container.appendChild(frame);
-
-    let labels = [];
-    let splitSeconds = [];
-    let heartRates = [];
-
-    datasetSplits.forEach(split => {
-        labels.push(`Split ${split['Split']}`);
-        splitSeconds.push(timeStringToSeconds(split['Avg Pace']));
-        heartRates.push(parseInt(split['Avg HR'], 10));
-    });
-
-    const minPaceSec = Math.min(...splitSeconds) - 20;
-    const maxPaceSec = Math.max(...splitSeconds) + 45; 
-    const minHR = Math.min(...heartRates) - 15;
-    const maxHR = Math.max(...heartRates) + 25; 
-
-    const instance = new Chart(canvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: `Pace (${useMetric ? 'Min/Km' : 'Min/Mile'})`,
-                    data: splitSeconds,
-                    backgroundColor: 'rgba(0, 85, 140, 0.40)', 
-                    borderColor: '#00558c',
-                    borderWidth: 1.5,
-                    yAxisID: 'yPace',
-                    order: 2,
-                    barPercentage: 0.55,
-                    datalabels: {
-                        // FIX: Tuck pace text cleanly inside the bar top to stay clear of the HR line
-                        anchor: 'end',
-                        align: 'start',      
-                        offset: 4,
-                        color: '#004c7d',
-                        font: { weight: 'bold', size: 10.5 },
-                        formatter: value => secondsToTimeString(value)
-                    }
-                },
-                {
-                    label: 'Heart Rate (bpm)',
-                    data: heartRates,
-                    type: 'line',
-                    borderColor: '#a30000',
-                    backgroundColor: '#a30000',
-                    borderWidth: 2.5,
-                    pointRadius: 4,
-                    yAxisID: 'yHR',
-                    order: 1,
-                    tension: 0.15,
-                    datalabels: {
-                        // FIX: Push HR numbers strictly above the plot dots
-                        anchor: 'end',
-                        align: 'top',      
-                        offset: 8,         
-                        color: '#a30000',
-                        font: { weight: 'bold', size: 10.5 },
-                        formatter: value => value + ' bpm'
-                    }
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: { 
-                padding: { top: 16, bottom: 0, left: 2, right: 2 } 
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#000', font: { weight: 'bold', size: 10.5 } }
-                },
-                yPace: {
-                    type: 'linear',
-                    position: 'left',
-                    min: minPaceSec,
-                    max: maxPaceSec,
-                    grid: { display: false },
-                    ticks: { color: '#555', font: { size: 10 }, callback: value => secondsToTimeString(value) }
-                },
-                yHR: {
-                    type: 'linear',
-                    position: 'right',
-                    min: minHR,
-                    max: maxHR,
-                    grid: { display: true },
-                    ticks: { color: '#555', font: { size: 10 } }
-                }
-            },
-            plugins: { 
-                datalabels: { display: true },
-                legend: {
-                    position: 'top',
-                    labels: { boxWidth: 25, font: { weight: '600', size: 11 }, padding: 6 }
-                }
+                document.getElementById('pace-km-min').value = kmMin || '';
+                document.getElementById('pace-km-sec').value = String(kmSec).padStart(2, '0');
+            } else {
+                document.getElementById('pace-km-min').value = '';
+                document.getElementById('pace-km-sec').value = '';
             }
         }
-    });
-    activeCharts.push(instance);
-}
-
-function renderVisualReport() {
-    if (parsedSplits.length === 0) {
-        alert("Please load a valid CSV file first!");
-        return;
     }
 
-    const useMetric = (currentUnitPreference === 'km');
-    const unitLabel = useMetric ? "km" : "mi";
-    const paceLabel = useMetric ? "/km" : "/mi";
+    // Helper: Clock Formatter
+    function formatTime(totalSeconds) {
+        if (isNaN(totalSeconds) || totalSeconds === Infinity || totalSeconds < 0) return "--:--";
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = Math.floor(totalSeconds % 60);
+        const ms = Math.round((totalSeconds % 1) * 10);
 
-    document.getElementById('lblDistance').innerText = `DISTANCE (${unitLabel.toUpperCase()})`;
-    document.getElementById('lblAvgPace').innerText = `AVG PACE (${paceLabel.toUpperCase()})`;
-    document.getElementById('thDist').innerText = `Distance (${unitLabel})`;
-    document.getElementById('thPace').innerText = `Pace (${paceLabel})`;
+        let timeStr = "";
+        if (h > 0) {
+            timeStr += h + ":" + (m < 10 ? "0" : "");
+        }
+        timeStr += m + ":" + (s < 10 ? "0" : "") + s;
+        
+        if (totalSeconds < 180 && ms > 0) {
+            timeStr += "." + ms;
+        }
+        
+        return timeStr;
+    }
 
-    document.getElementById('outRaceName').innerText = document.getElementById('raceName').value;
-    document.getElementById('outRaceDate').innerText = document.getElementById('raceDate').value;
-    
-    document.getElementById('outDist').innerText = document.getElementById('totalDist').value;
-    document.getElementById('outTotalTime').innerText = document.getElementById('totalTime').value;
-    document.getElementById('outAvgPace').innerText = document.getElementById('avgPace').value;
-    document.getElementById('outAvgHR').innerText = document.getElementById('avgHR').value;
-
-    let bestSplitNum = "-";
-    let minSplitSeconds = Infinity;
-
-    const tableBody = document.getElementById('tableRowsTarget');
-    tableBody.innerHTML = '';
-    
-    parsedSplits.forEach(split => {
-        let splitDistanceRaw = parseFloat(split['GetDistance']);
-        let splitPaceSecondsRaw = timeStringToSeconds(split['Avg Pace']);
-
-        if (splitPaceSecondsRaw > 0 && splitPaceSecondsRaw < minSplitSeconds) {
-            minSplitSeconds = splitPaceSecondsRaw;
-            bestSplitNum = split['Split'];
+    // Splitting Table Renderer
+    function renderSplitsTable() {
+        const distance = activeCalculation.distance;
+        const totalSeconds = activeCalculation.totalSeconds;
+        
+        let splitDistance = parseFloat(document.getElementById('split-distance').value);
+        
+        if (isNaN(splitDistance) || splitDistance <= 0) {
+            splitDistance = 200; 
         }
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><b>${split['Split']}</b></td>
-            <td>${cleanTimeFormat(split['Time'])}</td>
-            <td>${splitDistanceRaw.toFixed(2)}</td>
-            <td>${secondsToTimeString(splitPaceSecondsRaw)}</td>
-            <td>${split['Avg HR']}</td>
-            <td>${split['Max HR']}</td>
+        const splitsBody = document.getElementById('splits-body');
+        splitsBody.innerHTML = ""; 
+
+        const secondsPerMeter = totalSeconds / distance;
+        let currentDistance = splitDistance;
+
+        while (currentDistance < distance) {
+            const splitTimeSec = currentDistance * secondsPerMeter;
+            appendSplitRow(Math.round(currentDistance) + "m", formatTime(splitTimeSec));
+            currentDistance += splitDistance;
+        }
+
+        appendSplitRow(distance + "m", formatTime(totalSeconds), true);
+    }
+
+    // Live-rebuilding splits on interval updates
+    function updateSplitsOnIntervalChange() {
+        if (activeCalculation.distance > 0 && activeCalculation.totalSeconds > 0) {
+            renderSplitsTable();
+        }
+    }
+
+    // Shared Results Dashboard Builder
+    function renderResults(distance, totalSeconds, pacePerKm, pacePerMile, targetLabel = "Target Time") {
+        activeCalculation.distance = distance;
+        activeCalculation.totalSeconds = totalSeconds;
+        activeCalculation.pacePerKm = pacePerKm;
+        activeCalculation.pacePerMile = pacePerMile;
+        activeCalculation.targetLabel = targetLabel;
+        activeCalculation.card2IsMilePace = (targetLabel === "Pace per Mile");
+
+        document.getElementById('card-1-title').textContent = "Pace per KM";
+        document.getElementById('card-1-val').textContent = formatTime(pacePerKm) + " /km";
+
+        if (activeCalculation.card2IsMilePace) {
+            document.getElementById('card-2-title').textContent = "Pace per Mile";
+            document.getElementById('card-2-val').textContent = formatTime(pacePerMile) + " /mi";
+        } else {
+            document.getElementById('card-2-title').textContent = targetLabel;
+            document.getElementById('card-2-val').textContent = formatTime(totalSeconds);
+        }
+
+        renderSplitsTable();
+
+        document.getElementById('results').style.display = 'block';
+    }
+
+    function appendSplitRow(distLabel, timeStr, isFinal = false) {
+        const splitsBody = document.getElementById('splits-body');
+        const row = document.createElement('tr');
+        if (isFinal) {
+            row.style.fontWeight = 'bold';
+            row.style.borderTop = '2px solid var(--red)';
+            row.style.color = 'var(--red)';
+        }
+        row.innerHTML = `
+            <td>${distLabel}</td>
+            <td>${timeStr}</td>
         `;
-        tableBody.appendChild(tr);
-    });
-
-    if (minSplitSeconds !== Infinity) {
-        document.getElementById('insBestSplit').innerText = `Split ${bestSplitNum} (${secondsToTimeString(minSplitSeconds)})`;
-    } else {
-        document.getElementById('insBestSplit').innerText = "-";
+        splitsBody.appendChild(row);
     }
 
-    document.getElementById('insCadence').innerText = `${parsedSummary['Avg Run Cadence'] || parsedSummary['Avg Cadence'] || '-'} spm`;
-    document.getElementById('insStride').innerText = `${parsedSummary['Avg Stride Length'] || '-'} cm`;
-    
-    let gain = parsedSummary['Elevation Gain'] || '0';
-    let loss = parsedSummary['Elev Loss'] || '0';
-    document.getElementById('insElevation').innerText = `+${gain}m / -${loss}m`;
+    /* Primary Calculators */
 
-    activeCharts.forEach(c => c.destroy());
-    activeCharts = [];
-    const chartsContainer = document.getElementById('chartsContainer');
-    chartsContainer.innerHTML = '';
+    // Tab 1 (Time -> Splits) Calculator
+    function calculatePaceToSplits() {
+        const distance = parseFloat(document.getElementById('distance-t1').value);
+        const hours = parseInt(document.getElementById('hours-t1').value) || 0;
+        const minutes = parseInt(document.getElementById('minutes-t1').value) || 0;
+        const seconds = parseInt(document.getElementById('seconds-t1').value) || 0;
 
-    if (parsedSplits.length <= 10) {
-        createSubChartInstance('chartsContainer', parsedSplits, useMetric);
-    } else {
-        const midPoint = Math.ceil(parsedSplits.length / 2);
-        const firstHalf = parsedSplits.slice(0, midPoint);
-        const secondHalf = parsedSplits.slice(midPoint);
+        if (!distance || distance <= 0) {
+            alert("Please enter a valid distance.");
+            return;
+        }
+        const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+        if (totalSeconds <= 0) {
+            alert("Please enter a target time.");
+            return;
+        }
 
-        createSubChartInstance('chartsContainer', firstHalf, useMetric);
-        createSubChartInstance('chartsContainer', secondHalf, useMetric);
+        const pacePerKm = totalSeconds / (distance / 1000);
+        const pacePerMile = totalSeconds / (distance / METERS_PER_MILE);
+
+        renderResults(distance, totalSeconds, pacePerKm, pacePerMile, "Pace per Mile");
     }
 
-    updateDocumentTitle();
-    document.getElementById('reportWrapper').style.display = 'block';
-    document.getElementById('reportWrapper').scrollIntoView({ behavior: 'smooth' });
-}
+    // Tab 2 (Pace -> Time) Calculator
+    function calculatePaceToTime() {
+        const distance = parseFloat(document.getElementById('distance-t2').value);
+        const kmMin = parseInt(document.getElementById('pace-km-min').value) || 0;
+        const kmSec = parseInt(document.getElementById('pace-km-sec').value) || 0;
+
+        if (!distance || distance <= 0) {
+            alert("Please enter a valid distance.");
+            return;
+        }
+
+        const secPerKm = (kmMin * 60) + kmSec;
+        if (secPerKm <= 0) {
+            alert("Please enter a target pace.");
+            return;
+        }
+
+        const totalSeconds = (distance / 1000) * secPerKm;
+        const pacePerMile = secPerKm * (METERS_PER_MILE / 1000);
+
+        renderResults(distance, totalSeconds, secPerKm, pacePerMile, "Predicted Time");
+    }
 </script>
 
 </body>
