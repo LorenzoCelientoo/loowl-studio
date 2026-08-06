@@ -13,26 +13,40 @@
       padding: 0;
       box-sizing: border-box;
     }
-
     :root {
-      --black: #080808;
-      --dark: #111111;
-      --orange: #1B3A6B;
-      --orange-light: #2452A0;
-      --white: #F2F2F2;
+      --black: #0c0906;
+      --dark: #16110b;
+      --orange: #c9862f;
+      --orange-light: #e3ac5c;
+      --orange-deep: #8a5a22;
+      --white: #f1e7d6;
     }
-
     html {
       scroll-behavior: smooth;
     }
-
     body {
       font-family: 'Barlow Condensed', sans-serif;
       background: var(--black);
       color: var(--white);
       overflow-x: hidden;
     }
-
+    /* subtle diagonal weave texture, echoing the reference photo */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.35) 0px,
+        rgba(0, 0, 0, 0.35) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      opacity: 0.25;
+      mix-blend-mode: overlay;
+    }
     /* ── NAV ── */
     #navbar {
       position: fixed;
@@ -44,36 +58,31 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.2rem 4vw;
-      background: rgba(8, 8, 8, 0.5);
+      background: rgba(12, 9, 6, 0.5);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border-bottom: 2px solid var(--orange);
       transition: background 0.4s;
     }
-
     #navbar.scrolled {
-      background: rgba(8, 8, 8, 0.92);
+      background: rgba(12, 9, 6, 0.92);
     }
-
     #nav-logo {
-      font-family: Impact, 'Bebas Neue', sans-serif;
-      font-size: 1.8rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
+      font-family: 'CClassic', 'Bebas Neue', cursive;
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       text-decoration: none;
       color: var(--white);
     }
-
     #nav-logo span {
       color: var(--orange);
     }
-
     #nav-links {
       display: flex;
       gap: 0;
       list-style: none;
     }
-
     #nav-links a {
       display: block;
       font-family: Impact, 'Bebas Neue', sans-serif;
@@ -81,12 +90,11 @@
       letter-spacing: 0.2em;
       text-transform: uppercase;
       text-decoration: none;
-      color: rgba(242, 242, 242, 0.65);
+      color: rgba(241, 231, 214, 0.65);
       padding: 0.5rem 1.4rem;
       position: relative;
       transition: color 0.2s;
     }
-
     #nav-links a::after {
       content: '';
       position: absolute;
@@ -98,34 +106,28 @@
       transform: scaleX(0);
       transition: transform 0.25s;
     }
-
     #nav-links a:hover,
     #nav-links a.active {
       color: var(--white);
     }
-
     #nav-links a:hover::after,
     #nav-links a.active::after {
       transform: scaleX(1);
     }
-
     /* ── SCROLL ANIMATIONS ── */
     .reveal {
       opacity: 0;
       transform: translateY(40px);
       transition: opacity 0.8s ease, transform 0.8s ease;
     }
-
     .reveal.visible {
       opacity: 1;
       transform: translateY(0);
     }
-
     .reveal-delay-1 { transition-delay: 0.15s; }
     .reveal-delay-2 { transition-delay: 0.3s; }
     .reveal-delay-3 { transition-delay: 0.45s; }
     .reveal-delay-4 { transition-delay: 0.6s; }
-
     /* ── SECTION 1 · HERO ── */
     #hero {
       position: relative;
@@ -136,7 +138,6 @@
       justify-content: center;
       overflow: hidden;
     }
-
     #hero-video {
       position: absolute;
       inset: 0;
@@ -144,20 +145,18 @@
       height: 100%;
       object-fit: cover;
       object-position: center;
+      filter: sepia(0.35) saturate(1.15) brightness(0.9);
     }
-
     #hero-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(8, 8, 8, 0.55);
+      background: radial-gradient(ellipse at center, rgba(40, 26, 12, 0.35) 0%, rgba(12, 9, 6, 0.72) 100%);
     }
-
     #hero-content {
       position: relative;
       z-index: 2;
       text-align: center;
     }
-
     #hero-content h1 {
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: clamp(2.5rem, 8vw, 7rem);
@@ -167,22 +166,19 @@
       line-height: 0.9;
       letter-spacing: 0.04em;
     }
-
     #hero-content h1 span {
       color: var(--orange);
     }
-
     #hero-content .tagline {
       margin-top: 1.5rem;
       font-size: clamp(0.8rem, 1.8vw, 1.1rem);
       letter-spacing: 0.45em;
       text-transform: uppercase;
       color: var(--white);
-      opacity: 0.6;
+      opacity: 0.75;
       font-style: italic;
       font-weight: 300;
     }
-
     /* scroll hint */
     .scroll-hint {
       position: absolute;
@@ -201,7 +197,6 @@
       text-transform: uppercase;
       color: var(--white);
     }
-
     .scroll-hint::after {
       content: '';
       display: block;
@@ -210,13 +205,11 @@
       background: var(--orange);
       animation: drop 1.6s ease-in-out infinite;
     }
-
     @keyframes drop {
       0%   { opacity: 0; transform: scaleY(0); transform-origin: top; }
       50%  { opacity: 1; }
       100% { opacity: 0; transform: scaleY(1); transform-origin: top; }
     }
-
     /* ── SECTION 2 · REEL ── */
     #reel {
       position: relative;
@@ -227,21 +220,19 @@
       justify-content: flex-start;
       overflow: hidden;
     }
-
     #reel-video-bg {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      filter: sepia(0.3) saturate(1.1) brightness(0.85);
     }
-
     #reel-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(8, 8, 8, 0.82);
+      background: rgba(12, 9, 6, 0.82);
     }
-
     #reel-text {
       position: relative;
       z-index: 2;
@@ -256,7 +247,6 @@
       margin-left: 8vw;
       border-left: 4px solid var(--orange);
     }
-
     #reel-text .eyebrow {
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: 1rem;
@@ -264,7 +254,6 @@
       text-transform: uppercase;
       color: var(--orange);
     }
-
     #reel-text h2 {
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: clamp(2.2rem, 4.5vw, 4.5rem);
@@ -273,35 +262,32 @@
       letter-spacing: 0.03em;
       color: var(--white);
     }
-
     #reel-text p {
       font-size: clamp(1rem, 1.6vw, 1.2rem);
       font-weight: 300;
       line-height: 1.8;
-      color: rgba(242, 242, 242, 0.7);
+      color: rgba(241, 231, 214, 0.7);
       max-width: 55ch;
       letter-spacing: 0.02em;
     }
-
     #reel-text .cta {
       display: inline-block;
       margin-top: 0.5rem;
       padding: 0.85rem 2.8rem;
-      background: var(--orange);
-      color: var(--white);
+      background: linear-gradient(135deg, var(--orange), var(--orange-deep));
+      color: var(--black);
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: 1.1rem;
+      font-weight: 700;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       text-decoration: none;
       transition: background 0.25s, transform 0.2s;
     }
-
     #reel-text .cta:hover {
-      background: var(--orange-light);
+      background: linear-gradient(135deg, var(--orange-light), var(--orange));
       transform: translateX(5px);
     }
-
     /* ── SECTION 3 · WORK ── */
     #work {
       position: relative;
@@ -312,21 +298,19 @@
       justify-content: center;
       overflow: hidden;
     }
-
     #work-video-bg {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      filter: sepia(0.3) saturate(1.1) brightness(0.85);
     }
-
     #work-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(8, 8, 8, 0.80);
+      background: rgba(12, 9, 6, 0.80);
     }
-
     #work-content {
       position: relative;
       z-index: 2;
@@ -338,7 +322,6 @@
       align-items: center;
       gap: 2.5rem;
     }
-
     #work-content .eyebrow {
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: 1rem;
@@ -346,7 +329,6 @@
       text-transform: uppercase;
       color: var(--orange);
     }
-
     #work-content h2 {
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: clamp(2rem, 4vw, 4.5rem);
@@ -355,26 +337,23 @@
       letter-spacing: 0.03em;
       color: var(--white);
     }
-
     #work-content .work-intro {
       font-size: clamp(1rem, 1.6vw, 1.2rem);
       font-weight: 300;
       line-height: 1.8;
-      color: rgba(242, 242, 242, 0.7);
+      color: rgba(241, 231, 214, 0.7);
       max-width: 55ch;
       letter-spacing: 0.02em;
     }
-
     .work-tags {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 0.8rem;
     }
-
     .work-tags span {
       padding: 0.5rem 1.4rem;
-      background: rgba(27, 58, 107, 0.2);
+      background: rgba(201, 134, 47, 0.15);
       border: 2px solid var(--orange);
       color: var(--white);
       font-family: Impact, 'Bebas Neue', sans-serif;
@@ -383,11 +362,10 @@
       text-transform: uppercase;
       transition: background 0.2s;
     }
-
     .work-tags span:hover {
       background: var(--orange);
+      color: var(--black);
     }
-
     /* ── SECTION 4 · CONTACT ── */
     #contact {
       background: var(--dark);
@@ -397,12 +375,10 @@
       justify-content: center;
       padding: clamp(4rem, 10vw, 10rem) 2rem;
     }
-
     .contact-inner {
       text-align: center;
       max-width: 640px;
     }
-
     .contact-inner .eyebrow {
       font-family: Impact, 'Bebas Neue', sans-serif;
       font-size: 1rem;
@@ -411,40 +387,35 @@
       color: var(--orange);
       margin-bottom: 1rem;
     }
-
     .contact-inner h2 {
-      font-family: Impact, 'Bebas Neue', sans-serif;
-      font-size: clamp(2rem, 4.5vw, 4.5rem);
-      font-weight: 400;
+      font-family: 'CClassic', 'Bebas Neue', cursive;
+      font-weight: 700;
+      font-size: clamp(3rem, 8vw, 6.5rem);
       color: var(--white);
-      letter-spacing: 0.06em;
-      line-height: 0.95;
+      letter-spacing: 0.02em;
+      line-height: 1;
       margin-bottom: 1.5rem;
     }
-
     .contact-inner p {
       font-size: clamp(0.95rem, 1.3vw, 1.1rem);
       font-weight: 300;
       line-height: 1.8;
-      color: rgba(242, 242, 242, 0.45);
+      color: rgba(241, 231, 214, 0.45);
       margin-bottom: 3rem;
       letter-spacing: 0.02em;
     }
-
     .contact-divider {
       width: 60px;
       height: 3px;
       background: var(--orange);
       margin: 0 auto 3rem;
     }
-
     .contact-links {
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
       align-items: center;
     }
-
     .contact-links a {
       color: var(--white);
       text-decoration: none;
@@ -454,11 +425,9 @@
       text-transform: uppercase;
       transition: color 0.25s;
     }
-
     .contact-links a:hover {
       color: var(--orange);
     }
-
     /* ── HAMBURGER ── */
     #hamburger {
       display: none;
@@ -469,7 +438,6 @@
       background: none;
       border: none;
     }
-
     #hamburger span {
       display: block;
       width: 26px;
@@ -477,16 +445,12 @@
       background: var(--orange);
       transition: transform 0.3s, opacity 0.3s;
     }
-
     #hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     #hamburger.open span:nth-child(2) { opacity: 0; }
     #hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-
       #hamburger { display: flex; }
-
       #nav-links {
         display: none;
         flex-direction: column;
@@ -495,84 +459,66 @@
         top: 100%;
         left: 0;
         width: 100%;
-        background: rgba(8, 8, 8, 0.98);
+        background: rgba(12, 9, 6, 0.98);
         backdrop-filter: blur(18px);
         -webkit-backdrop-filter: blur(18px);
         border-top: 2px solid var(--orange);
         padding: 1rem 0;
       }
-
       #nav-links.open { display: flex; }
       #nav-links li { width: 100%; }
-
       #nav-links a {
         padding: 1rem 2rem;
         font-size: 1.4rem;
         letter-spacing: 0.2em;
-        border-bottom: 1px solid rgba(232, 64, 12, 0.15);
+        border-bottom: 1px solid rgba(201, 134, 47, 0.15);
       }
-
       #nav-links a::after { display: none; }
-
       #hero-content h1 {
         font-size: clamp(2rem, 10vw, 4rem);
       }
-
       #hero-content .tagline {
         font-size: clamp(0.65rem, 3vw, 0.85rem);
         letter-spacing: 0.25em;
       }
-
       #reel { justify-content: center; }
-
       #reel-text {
         margin-left: 0;
         padding: 7rem 1.5rem 4rem 2rem;
         max-width: 100%;
         border-left: 3px solid var(--orange);
       }
-
       #reel-text p { max-width: 100%; }
-
       #work-content {
         padding: 6rem 1.5rem 4rem;
         gap: 2rem;
       }
-
       #work-content h2 {
         font-size: clamp(1.8rem, 7vw, 3rem);
       }
-
       .work-tags { gap: 0.6rem; }
-
       .work-tags span {
         font-size: 0.9rem;
         padding: 0.4rem 0.9rem;
         letter-spacing: 0.1em;
       }
-
       #contact { padding: 5rem 1.5rem; }
-
       .contact-inner h2 {
-        font-size: clamp(1.8rem, 7vw, 3rem);
+        font-size: clamp(2.4rem, 12vw, 4rem);
       }
-
       .contact-links a {
         font-size: 1rem;
         letter-spacing: 0.15em;
         word-break: break-all;
       }
     }
-
     @media (max-width: 400px) {
       #hero-content h1 { font-size: 2rem; }
       #reel-text h2 { font-size: 2rem; }
     }
-
   </style>
 </head>
 <body>
-
   <nav id="navbar">
     <a id="nav-logo" href="#hero">Lo<span>owl</span> Studio</a>
     <button id="hamburger" aria-label="Menu">
@@ -585,19 +531,17 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
-
   <section id="hero">
     <video id="hero-video" autoplay muted loop playsinline>
       <source src="coffee.mp4" type="video/mp4" />
     </video>
     <div id="hero-overlay"></div>
     <div id="hero-content">
-      <img src="logo.png" alt="LoowL Studio" style="width: clamp(280px, 55vw, 750px); max-width: 90vw; opacity: 0.75;" />
+      <img src="logo.png" alt="LoowL Studio" style="width: clamp(280px, 55vw, 750px); max-width: 90vw; opacity: 0.85;" />
       <p class="tagline">Have fun and remember it</p>
     </div>
     <div class="scroll-hint">Scroll</div>
   </section>
-
   <section id="reel">
     <video id="reel-video-bg" autoplay muted loop playsinline>
       <source src="run.mp4" type="video/mp4" />
@@ -607,12 +551,11 @@
       <p class="eyebrow reveal">About me</p>
       <h2 class="reveal reveal-delay-1">Just a guy with<br>an iPhone, a keyboard,<br>and too many dreams.</h2>
       <p class="reveal reveal-delay-2">
-        I’m in love with running, storytelling, and cinematic visuals—capturing life one frame at a time. But when I’m not behind a lens, I’m building behind a screen. Beyond videos, I build custom websites and design tailored management software to help individuals and businesses organize their ideas and workflows seamlessly. 
+        I’m in love with running, storytelling, and cinematic visuals—capturing life one frame at a time. But when I’m not behind a lens, I’m building behind a screen. Beyond videos, I build custom websites and design tailored management software to help individuals and businesses organize their ideas and workflows seamlessly.
       </p>
       <a class="cta reveal reveal-delay-3" href="#contact">Say hello</a>
     </div>
   </section>
-
   <section id="work">
     <video id="work-video-bg" autoplay muted loop playsinline>
       <source src="3section.mp4" type="video/mp4" />
@@ -634,7 +577,6 @@
       </div>
     </div>
   </section>
-
   <section id="contact">
     <div class="contact-inner">
       <p class="eyebrow reveal">contact</p>
@@ -647,14 +589,12 @@
       </div>
     </div>
   </section>
-
   <script>
     // ── Navbar darken on scroll ──
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       navbar.classList.toggle('scrolled', window.scrollY > 60);
     });
-
     // ── Hamburger menu ──
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('nav-links');
@@ -669,7 +609,6 @@
         navLinks.classList.remove('open');
       });
     });
-
     // ── Scroll animations ──
     const revealEls = document.querySelectorAll('.reveal');
     const revealObserver = new IntersectionObserver((entries) => {
@@ -680,7 +619,6 @@
       });
     }, { threshold: 0.15 });
     revealEls.forEach(el => revealObserver.observe(el));
-
     // ── Active nav state ──
     const sections = document.querySelectorAll('section[id]');
     const navLinkItems = document.querySelectorAll('#nav-links a');
@@ -694,8 +632,6 @@
       });
     }, { threshold: 0.4 });
     sections.forEach(section => activeObserver.observe(section));
-
   </script>
-
 </body>
 </html>
