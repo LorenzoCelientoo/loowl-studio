@@ -44,6 +44,9 @@
     flex-direction: column;
     position: relative;
   }
+  @media (min-width: 900px) {
+    .app { max-width: 720px; }
+  }
   .glow {
     position: absolute;
     inset: 0;
@@ -99,6 +102,33 @@
   .hero.compact .title {
     font-size: 15px;
     margin-top: 8px;
+  }
+  .tagline {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+    transition: opacity 0.3s ease, height 0.3s ease, margin 0.3s ease;
+  }
+  .hero.compact .tagline {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+  @media (min-width: 900px) {
+    .hero:not(.compact) .avatar {
+      width: 160px;
+      height: 160px;
+      font-size: 76px;
+    }
+    .hero:not(.compact) .title {
+      font-size: 40px;
+      margin-top: 20px;
+    }
+    .hero:not(.compact) .tagline {
+      font-size: 15px;
+    }
   }
   #messages {
     flex: 1;
@@ -205,6 +235,11 @@
   button#send:active { transform: scale(0.94); }
   #messages::-webkit-scrollbar { width: 6px; }
   #messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+  @media (min-width: 900px) {
+    #input, .bubble { font-size: 16px; }
+    .input-wrap { padding: 8px 8px 8px 24px; }
+    button#send { width: 44px; height: 44px; font-size: 18px; }
+  }
 </style>
 </head>
 <body>
@@ -213,6 +248,7 @@
   <div class="hero" id="hero">
     <div class="avatar">🤖</div>
     <div class="title">YoBoti</div>
+    <div class="tagline">Powered by Emma</div>
   </div>
   <div id="messages"></div>
   <form id="composer" autocomplete="off">
